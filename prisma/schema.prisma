@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------------------------------
+//  USER
+// --------------------------------------------------
+model User {
+  id                 String              @id @default(auto()) @map("_id") @db.ObjectId
+  email              String              @unique
+  name               String?
+  imageUrl           String?
+
+  credits            Int                 @default(0)
+
+  audioFiles         AudioFile[]
+  transcriptions     Transcription[]
+  creditPurchases    CreditPurchase[]
+
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+}
+
+// --------------------------------------------------
+//  AUDIO FILE
+// --------------------------------------------------
+model AudioFile {
+  id                 String        @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId             String        @db.ObjectId
+  user               User          @relation(fields: [userId], references: [id])
+
+  url                String
+  originalFilename   String?
+  sizeBytes          Int?
+  durationSeconds    Int?
+
+  // relação 1:1 com transcrição
+  transcription      Transcription?
+
+  createdAt          DateTime      @default(now())
+}
+
+// --------------------------------------------------
+//  TRANSCRIPTION
+// --------------------------------------------------
+model Transcription {
+  id                 String        @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId             String        @db.ObjectId
+  user               User          @relation(fields: [userId], references: [id])
+
+  audioFileId        String?       @unique @db.ObjectId   // UNIQUE porque é 1:1
+  audioFile          AudioFile?    @relation(fields: [audioFileId], references: [id])
+
+  text               String
+  summary            Summary?
+
+  costCredits        Int           @default(1)
+
+  createdAt          DateTime      @default(now())
+}
+
+// --------------------------------------------------
+//  SUMMARY
+// --------------------------------------------------
+model Summary {
+  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+
+  transcriptionId    String         @unique @db.ObjectId  // UNIQUE porque é 1:1
+  transcription      Transcription  @relation(fields: [transcriptionId], references: [id])
+
+  bulletPoints       String?
+  keywords           String?
+  sentiment          String?
+  shortSummary       String?
+  longSummary        String?
+  language           String?
+
+  createdAt          DateTime       @default(now())
+}
+
+// --------------------------------------------------
+//  CREDIT PURCHASE
+// --------------------------------------------------
+model CreditPurchase {
+  id                 String       @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId             String       @db.ObjectId
+  user               User         @relation(fields: [userId], references: [id])
+
+  stripePaymentId    String?      @unique
+  amountCredits      Int
+  amountPaid         Float
+  status             String        // succeeded | pending | failed
+
+  createdAt          DateTime     @default(now())
+}
