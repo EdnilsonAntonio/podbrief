@@ -23,7 +23,7 @@ model User {
   name               String?
   imageUrl           String?
 
-  credits            Int                 @default(0)
+  credits            Float               @default(0)
 
   audioFiles         AudioFile[]
   transcriptions     Transcription[]
@@ -46,6 +46,7 @@ model AudioFile {
   originalFilename   String?
   sizeBytes          Int?
   durationSeconds    Int?
+  status             String        @default("pending") // pending | processing | completed | error
 
   // relação 1:1 com transcrição
   transcription      Transcription?
@@ -68,7 +69,10 @@ model Transcription {
   text               String
   summary            Summary?
 
-  costCredits        Int           @default(1)
+  costCredits        Float         @default(1)
+
+  shareToken         String?       // Token único para compartilhamento público
+  isPublic           Boolean       @default(false) // Se a transcrição está pública
 
   createdAt          DateTime      @default(now())
 }

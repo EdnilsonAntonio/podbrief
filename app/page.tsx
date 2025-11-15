@@ -42,7 +42,7 @@ export default async function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="container space-y-6 py-20 text-center">
+      <section className="container mx-auto space-y-6 py-20 text-center">
         <div className="mx-auto max-w-3xl space-y-6">
           <Badge variant="secondary" className="mx-auto">
             AI-Powered Transcription & Summarization
@@ -81,14 +81,14 @@ export default async function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="container space-y-12 py-20">
+      <section className="container mx-auto space-y-12 py-20">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight">How It Works</h2>
           <p className="mt-2 text-muted-foreground">
             Three simple steps to get your transcriptions and summaries
           </p>
         </div>
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
           <Card>
             <CardHeader>
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
@@ -132,14 +132,14 @@ export default async function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section className="container space-y-12 py-20">
+      <section className="container mx-auto space-y-12 py-20">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight">Simple, Transparent Pricing</h2>
           <p className="mt-2 text-muted-foreground">
             Choose the plan that fits your needs. All plans include full access to all features.
           </p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 max-w-7xl mx-auto">
           {PRICING_PLANS.map((plan) => (
             <Card
               key={plan.id}
@@ -193,7 +193,7 @@ export default async function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t py-12">
-        <div className="container">
+        <div className="container mx-auto">
           <div className="grid gap-8 md:grid-cols-4">
             <div>
               <div className="flex items-center gap-2 mb-4">

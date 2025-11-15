@@ -2,12 +2,31 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
-import { FileAudio, Clock, CreditCard, Eye, Download, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { FileAudio, Clock, CreditCard, Eye, Download, CheckCircle2, XCircle, Loader2, FileText, FileJson } from "lucide-react";
 import Link from "next/link";
-import type { Transcription } from "@/lib/mock-data";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { downloadTranscription } from "@/lib/download-utils";
+import { toast } from "sonner";
+
+interface TranscriptionCardData {
+    id: string;
+    fileName: string;
+    duration: number;
+    creditsUsed: number;
+    status: "completed" | "processing" | "error" | "pending";
+    createdAt: Date;
+    audioUrl?: string;
+    transcription?: string;
+    summary?: any;
+}
 
 interface TranscriptionCardProps {
-    transcription: Transcription;
+    transcription: TranscriptionCardData;
 }
 
 export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
@@ -25,6 +44,13 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
                     <Badge variant="secondary">
                         <Loader2 className="mr-1 h-3 w-3 animate-spin" />
                         Processing
+                    </Badge>
+                );
+            case "pending":
+                return (
+                    <Badge variant="secondary">
+                        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                        Pending
                     </Badge>
                 );
             case "error":
@@ -65,7 +91,12 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
                     </div>
                     <div className="flex items-center gap-1">
                         <CreditCard className="h-4 w-4" />
-                        <span>{transcription.creditsUsed} credits</span>
+                        <span>
+                            {transcription.creditsUsed % 1 === 0
+                                ? transcription.creditsUsed.toFixed(0)
+                                : transcription.creditsUsed.toFixed(2)}{" "}
+                            credits
+                        </span>
                     </div>
                 </div>
             </CardContent>
@@ -77,10 +108,55 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
                             View
                         </Link>
                     </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
-                        <Download className="mr-2 h-4 w-4" />
-                        Download
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="flex-1">
+                                <Download className="mr-2 h-4 w-4" />
+                                Download
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                onClick={async () => {
+                                    try {
+                                        await downloadTranscription(transcription.id, "txt");
+                                        toast.success("Download started");
+                                    } catch (error) {
+                                        toast.error("Failed to download");
+                                    }
+                                }}
+                            >
+                                <FileText className="mr-2 h-4 w-4" />
+                                TXT
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={async () => {
+                                    try {
+                                        await downloadTranscription(transcription.id, "json");
+                                        toast.success("Download started");
+                                    } catch (error) {
+                                        toast.error("Failed to download");
+                                    }
+                                }}
+                            >
+                                <FileJson className="mr-2 h-4 w-4" />
+                                JSON
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={async () => {
+                                    try {
+                                        await downloadTranscription(transcription.id, "srt");
+                                        toast.success("Download started");
+                                    } catch (error) {
+                                        toast.error("Failed to download");
+                                    }
+                                }}
+                            >
+                                <FileText className="mr-2 h-4 w-4" />
+                                SRT
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </CardFooter>
             )}
         </Card>

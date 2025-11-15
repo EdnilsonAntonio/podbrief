@@ -1,9 +1,99 @@
+"use client";
+
 import { TranscriptionCard } from "@/components/dashboard/TranscriptionCard";
-import { MOCK_TRANSCRIPTIONS } from "@/lib/mock-data";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Filter, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+
+interface Transcription {
+    id: string;
+    audioFile: {
+        id: string;
+        originalFilename: string | null;
+        durationSeconds: number | null;
+        status: string;
+        createdAt: Date;
+    };
+    costCredits: number;
+    createdAt: Date;
+    _isProcessing?: boolean; // Flag para identificar itens em processamento
+}
+
+async function fetchTranscriptions(): Promise<Transcription[]> {
+    const response = await fetch("/api/transcriptions");
+    if (!response.ok) {
+        throw new Error("Failed to fetch transcriptions");
+    }
+    return response.json();
+}
 
 export default function TranscriptionsPage() {
+    const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState<string>("all");
+
+    const { data: transcriptions, isLoading, refetch } = useQuery({
+        queryKey: ["transcriptions"],
+        queryFn: fetchTranscriptions,
+        refetchInterval: (data) => {
+            // Se houver transcrições em processamento, atualizar a cada 3 segundos
+            if (!data || !Array.isArray(data)) {
+                return false;
+            }
+            const hasProcessing = data.some(
+                (t: Transcription) => t.audioFile.status === "processing" || t.audioFile.status === "pending"
+            );
+            return hasProcessing ? 3000 : false;
+        },
+    });
+
+    // Filtrar transcrições baseado na busca e status
+    const filteredTranscriptions = useMemo(() => {
+        if (!transcriptions) return [];
+
+        let filtered = transcriptions;
+
+        // Filtrar por status
+        if (statusFilter !== "all") {
+            filtered = filtered.filter(
+                (t: Transcription) => t.audioFile.status === statusFilter
+            );
+        }
+
+        // Filtrar por termo de busca (nome do arquivo)
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter((t: Transcription) => {
+                const fileName = (t.audioFile.originalFilename || "Unknown").toLowerCase();
+                return fileName.includes(query);
+            });
+        }
+
+        return filtered;
+    }, [transcriptions, searchQuery, statusFilter]);
+
+    const statusCounts = useMemo(() => {
+        if (!transcriptions) return { all: 0, completed: 0, processing: 0, pending: 0, error: 0 };
+
+        return {
+            all: transcriptions.length,
+            completed: transcriptions.filter((t: Transcription) => t.audioFile.status === "completed").length,
+            processing: transcriptions.filter((t: Transcription) => t.audioFile.status === "processing").length,
+            pending: transcriptions.filter((t: Transcription) => t.audioFile.status === "pending").length,
+            error: transcriptions.filter((t: Transcription) => t.audioFile.status === "error").length,
+        };
+    }, [transcriptions]);
+
     return (
         <div className="space-y-6">
             <div>
@@ -13,21 +103,150 @@ export default function TranscriptionsPage() {
                 </p>
             </div>
 
-            <div className="flex items-center gap-4">
-                <div className="relative flex-1 max-w-sm">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div className="relative flex-1 max-w-sm w-full">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
-                        placeholder="Search transcriptions..."
+                        placeholder="Search by filename..."
                         className="pl-9"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                    {searchQuery && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                            onClick={() => setSearchQuery("")}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    )}
+                </div>
+                <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Filter by status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">
+                                <span className="flex items-center gap-2">
+                                    All Status
+                                    <Badge variant="secondary" className="ml-auto">
+                                        {statusCounts.all}
+                                    </Badge>
+                                </span>
+                            </SelectItem>
+                            <SelectItem value="completed">
+                                <span className="flex items-center gap-2">
+                                    Completed
+                                    <Badge variant="secondary" className="ml-auto">
+                                        {statusCounts.completed}
+                                    </Badge>
+                                </span>
+                            </SelectItem>
+                            <SelectItem value="processing">
+                                <span className="flex items-center gap-2">
+                                    Processing
+                                    <Badge variant="secondary" className="ml-auto">
+                                        {statusCounts.processing}
+                                    </Badge>
+                                </span>
+                            </SelectItem>
+                            <SelectItem value="pending">
+                                <span className="flex items-center gap-2">
+                                    Pending
+                                    <Badge variant="secondary" className="ml-auto">
+                                        {statusCounts.pending}
+                                    </Badge>
+                                </span>
+                            </SelectItem>
+                            <SelectItem value="error">
+                                <span className="flex items-center gap-2">
+                                    Error
+                                    <Badge variant="secondary" className="ml-auto">
+                                        {statusCounts.error}
+                                    </Badge>
+                                </span>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {MOCK_TRANSCRIPTIONS.map((transcription) => (
-                    <TranscriptionCard key={transcription.id} transcription={transcription} />
-                ))}
-            </div>
+            {/* Mostrar contadores de resultados */}
+            {(searchQuery || statusFilter !== "all") && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>
+                        Showing {filteredTranscriptions.length} of {transcriptions?.length || 0} transcriptions
+                    </span>
+                    {(searchQuery || statusFilter !== "all") && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                                setSearchQuery("");
+                                setStatusFilter("all");
+                            }}
+                            className="h-auto p-0 text-xs"
+                        >
+                            Clear filters
+                        </Button>
+                    )}
+                </div>
+            )}
+
+            {isLoading ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="space-y-4 p-6 border rounded-lg">
+                            <Skeleton className="h-4 w-3/4" />
+                            <Skeleton className="h-4 w-1/2" />
+                            <Skeleton className="h-20 w-full" />
+                        </div>
+                    ))}
+                </div>
+            ) : filteredTranscriptions && filteredTranscriptions.length > 0 ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredTranscriptions.map((transcription: Transcription) => {
+                        // Para transcrições completas, usar o ID da Transcription
+                        // Para itens em processamento, o ID é do AudioFile (será resolvido pela API)
+                        const transcriptionId = transcription._isProcessing
+                            ? transcription.audioFile.id
+                            : transcription.id;
+
+                        return (
+                            <TranscriptionCard
+                                key={transcription.id}
+                                transcription={{
+                                    id: transcriptionId,
+                                    fileName: transcription.audioFile.originalFilename || "Unknown",
+                                    duration: transcription.audioFile.durationSeconds
+                                        ? Math.ceil(transcription.audioFile.durationSeconds / 60)
+                                        : 0,
+                                    creditsUsed: transcription.costCredits,
+                                    status: (transcription.audioFile.status || "pending") as "completed" | "processing" | "error" | "pending",
+                                    createdAt: new Date(transcription.audioFile.createdAt),
+                                    audioUrl: "",
+                                    transcription: "",
+                                    summary: null,
+                                }}
+                            />
+                        );
+                    })}
+                </div>
+            ) : transcriptions && transcriptions.length > 0 ? (
+                <div className="text-center py-12">
+                    <p className="text-muted-foreground">
+                        No transcriptions match your filters. Try adjusting your search or filters.
+                    </p>
+                </div>
+            ) : (
+                <div className="text-center py-12">
+                    <p className="text-muted-foreground">No transcriptions yet. Upload an audio file to get started!</p>
+                </div>
+            )}
         </div>
     );
 }

@@ -36,7 +36,7 @@ export default async function PricingPage() {
                 </div>
             </header>
 
-            <div className="container space-y-12 py-20">
+            <div className="container mx-auto space-y-12 py-20">
                 <div className="text-center">
                     <Button asChild variant="ghost" className="mb-6">
                         <Link href="/">
@@ -50,7 +50,7 @@ export default async function PricingPage() {
                     </p>
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 max-w-7xl mx-auto">
                     {PRICING_PLANS.map((plan) => (
                         <Card
                             key={plan.id}
@@ -105,7 +105,7 @@ export default async function PricingPage() {
                     ))}
                 </div>
 
-                <div className="rounded-lg border bg-muted p-8 text-center">
+                <div className="rounded-lg border bg-muted p-8 text-center max-w-2xl mx-auto">
                     <h3 className="text-xl font-semibold mb-2">Need more?</h3>
                     <p className="text-muted-foreground mb-4">
                         Contact us for custom enterprise plans with unlimited credits and dedicated support.

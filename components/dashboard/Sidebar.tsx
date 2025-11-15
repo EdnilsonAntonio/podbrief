@@ -42,7 +42,11 @@ export function DashboardSidebar() {
             <div className="flex h-full flex-col gap-4 p-4">
                 <nav className="space-y-1">
                     {navigation.map((item) => {
-                        const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+                        // For dashboard, only match exact path
+                        // For other routes, match exact path or sub-routes
+                        const isActive = item.href === "/dashboard"
+                            ? pathname === item.href
+                            : pathname === item.href || pathname?.startsWith(item.href + "/");
                         return (
                             <Link
                                 key={item.name}
