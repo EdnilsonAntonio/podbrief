@@ -14,7 +14,7 @@ export default async function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
@@ -51,11 +51,11 @@ export default async function LandingPage() {
             Transform Your Podcasts into
             <span className="text-primary"> Actionable Insights</span>
           </h1>
-          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+          <p className="mx-auto max-w-2xl px-4 text-base text-muted-foreground sm:text-lg">
             Upload your audio files and get instant transcriptions and AI-generated summaries.
             Perfect for content creators, researchers, and podcasters.
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col items-center justify-center gap-4 px-4 sm:flex-row">
             {isLoggedIn ? (
               <Button asChild size="lg">
                 <Link href="/dashboard/upload">
@@ -139,7 +139,7 @@ export default async function LandingPage() {
             Choose the plan that fits your needs. All plans include full access to all features.
           </p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 max-w-7xl mx-auto">
+        <div className="grid gap-6 px-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 max-w-7xl mx-auto">
           {PRICING_PLANS.map((plan) => (
             <Card
               key={plan.id}
@@ -176,7 +176,7 @@ export default async function LandingPage() {
                 </div>
                 {isLoggedIn ? (
                   <Button asChild className="w-full" variant={plan.popular ? "default" : "outline"}>
-                    <Link href="/settings">Change Plan</Link>
+                    <Link href="/pricing">Purchase Credits</Link>
                   </Button>
                 ) : (
                   <LoginLink>
@@ -216,15 +216,15 @@ export default async function LandingPage() {
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#" className="hover:text-foreground">About</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Contact</Link></li>
+                <li><Link href="/about" className="hover:text-foreground">About</Link></li>
+                <li><Link href="/contact" className="hover:text-foreground">Contact</Link></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#" className="hover:text-foreground">Privacy</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Terms</Link></li>
+                <li><Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-foreground">Terms of Service</Link></li>
               </ul>
             </div>
           </div>

@@ -4,6 +4,8 @@ import { prisma } from "@/db/prisma";
 import { writeFile, unlink } from "fs/promises";
 import { join } from "path";
 import { existsSync, mkdirSync } from "fs";
+import { checkUploadRateLimit } from "@/lib/rate-limit";
+import { logTranscriptionError, LogLevel, log } from "@/lib/monitoring";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,6 +13,28 @@ export async function POST(request: NextRequest) {
     const user = await getAuthenticatedUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Verificar rate limit (10 uploads por hora)
+    const rateLimitResult = await checkUploadRateLimit(`upload:${user.id}`);
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          error: "Rate limit exceeded",
+          message: `You have exceeded the upload limit. Please try again after ${new Date(
+            rateLimitResult.reset
+          ).toLocaleTimeString()}`,
+          reset: rateLimitResult.reset,
+        },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": rateLimitResult.limit.toString(),
+            "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+            "X-RateLimit-Reset": rateLimitResult.reset.toString(),
+          },
+        }
+      );
     }
 
     // Verificar créditos
@@ -213,12 +237,25 @@ async function processTranscription(
     const currentCredits = audioFile.user.credits;
     const newCredits = Math.max(0, currentCredits - creditsToDeduct);
 
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: audioFile.userId },
       data: {
         credits: Math.round(newCredits * 100) / 100, // Arredondar para 2 casas decimais
       },
     });
+
+    // Verificar se créditos estão baixos (< 10) e enviar email (assíncrono, não bloqueia)
+    if (updatedUser.credits < 10) {
+      import("@/lib/emails").then(({ sendLowCreditsEmail }) => {
+        sendLowCreditsEmail({
+          to: updatedUser.email,
+          name: updatedUser.name,
+          currentCredits: updatedUser.credits,
+        }).catch((error) => {
+          console.error("Failed to send low credits email:", error);
+        });
+      });
+    }
 
     // Atualizar status e duração do arquivo
     await prisma.audioFile.update({
@@ -243,15 +280,31 @@ async function processTranscription(
 
     return transcriptionRecord;
   } catch (error: any) {
-    console.error("Transcription processing error:", error);
+    // Log estruturado do erro
+    logTranscriptionError(audioFileId, error, {
+      filepath,
+      originalFilename,
+    });
 
     // Determinar mensagem de erro baseada no tipo
     let errorMessage = "Failed to process transcription";
+    let logLevel = LogLevel.ERROR;
+
     if (error?.status === 429 || error?.code === "insufficient_quota") {
       errorMessage =
         "OpenAI API quota exceeded. Please check your OpenAI account billing.";
+      logLevel = LogLevel.CRITICAL; // Quota é crítico
+      log(logLevel, "OpenAI quota exceeded", {
+        audioFileId,
+        error: error.message,
+      });
     } else if (error?.status === 401) {
       errorMessage = "OpenAI API key is invalid or expired.";
+      logLevel = LogLevel.CRITICAL; // API key inválida é crítico
+      log(logLevel, "OpenAI API key invalid", {
+        audioFileId,
+        error: error.message,
+      });
     } else if (error?.message) {
       errorMessage = error.message;
     }

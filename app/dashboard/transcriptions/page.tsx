@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Filter, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Select,
@@ -45,17 +45,48 @@ export default function TranscriptionsPage() {
     const { data: transcriptions, isLoading, refetch } = useQuery({
         queryKey: ["transcriptions"],
         queryFn: fetchTranscriptions,
-        refetchInterval: (data) => {
-            // Se houver transcrições em processamento, atualizar a cada 3 segundos
+        refetchInterval: (query) => {
+            // Se houver transcrições em processamento, atualizar a cada 2 segundos
+            const data = query.state.data;
             if (!data || !Array.isArray(data)) {
                 return false;
             }
             const hasProcessing = data.some(
                 (t: Transcription) => t.audioFile.status === "processing" || t.audioFile.status === "pending"
             );
-            return hasProcessing ? 3000 : false;
+            return hasProcessing ? 2000 : false;
         },
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
+        staleTime: 0, // Sempre considerar os dados como stale para forçar refetch
     });
+
+    // Monitorar mudanças nas transcrições e forçar refetch quando necessário
+    // Usamos audioFile.id como identificador único, pois o id da transcrição muda quando completa
+    const previousTranscriptionsRef = useRef<Transcription[] | undefined>(undefined);
+    useEffect(() => {
+        if (transcriptions && previousTranscriptionsRef.current) {
+            // Criar map de status anterior usando audioFile.id como chave
+            const previousStatuses = new Map(
+                previousTranscriptionsRef.current.map((t) => [t.audioFile.id, t.audioFile.status])
+            );
+            
+            // Verificar se alguma transcrição mudou de status ou se uma nova transcrição apareceu
+            const hasStatusChanged = transcriptions.some((t) => {
+                const previousStatus = previousStatuses.get(t.audioFile.id);
+                // Se não tinha status anterior, é uma nova transcrição
+                // Se tinha status anterior e mudou, houve mudança
+                return !previousStatus || previousStatus !== t.audioFile.status;
+            });
+
+            // Se houve mudança de status ou nova transcrição, forçar refetch
+            if (hasStatusChanged) {
+                // Forçar refetch imediatamente para pegar a última versão
+                refetch();
+            }
+        }
+        previousTranscriptionsRef.current = transcriptions;
+    }, [transcriptions, refetch]);
 
     // Filtrar transcrições baseado na busca e status
     const filteredTranscriptions = useMemo(() => {
@@ -103,8 +134,8 @@ export default function TranscriptionsPage() {
                 </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <div className="relative flex-1 max-w-sm w-full">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                <div className="relative flex-1 w-full sm:max-w-sm">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         placeholder="Search by filename..."
@@ -126,7 +157,7 @@ export default function TranscriptionsPage() {
                 <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4 text-muted-foreground" />
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger className="w-full sm:w-[180px]">
                             <SelectValue placeholder="Filter by status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -208,7 +239,7 @@ export default function TranscriptionsPage() {
                     ))}
                 </div>
             ) : filteredTranscriptions && filteredTranscriptions.length > 0 ? (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredTranscriptions.map((transcription: Transcription) => {
                         // Para transcrições completas, usar o ID da Transcription
                         // Para itens em processamento, o ID é do AudioFile (será resolvido pela API)

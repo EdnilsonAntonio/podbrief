@@ -363,12 +363,12 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <div className="flex items-start justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex-1">
+                    <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
                         {transcription.audioFile.originalFilename || "Transcription"}
                     </h1>
-                    <div className="mt-2 flex flex-wrap gap-4 text-sm text-muted-foreground">
+                    <div className="mt-2 flex flex-wrap gap-2 sm:gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
                             <span>{format(new Date(transcription.createdAt), "PPP")}</span>
@@ -389,8 +389,8 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                             </span>
                         </div>
                     </div>
-                </div>
-                <div className="flex gap-2">
+                    </div>
+                    <div className="flex flex-wrap gap-2">
                     <Button
                         variant="outline"
                         onClick={() => handleCopy(transcription.text)}

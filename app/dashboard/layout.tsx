@@ -12,7 +12,7 @@ export default function DashboardLayout({
             <div className="flex flex-1">
                 <DashboardSidebar />
                 <main className="flex-1 overflow-y-auto">
-                    <div className="container p-6">{children}</div>
+                    <div className="container p-4 sm:p-6">{children}</div>
                 </main>
             </div>
         </div>

@@ -56,7 +56,7 @@ export default function SharedTranscriptionPage({ params }: { params: Promise<{ 
 
     if (isLoading) {
         return (
-            <div className="container mx-auto max-w-4xl py-8 space-y-6">
+            <div className="container mx-auto max-w-4xl py-8 px-4 space-y-6">
                 <Skeleton className="h-8 w-64" />
                 <Skeleton className="h-32 w-full" />
                 <Skeleton className="h-64 w-full" />
@@ -69,15 +69,15 @@ export default function SharedTranscriptionPage({ params }: { params: Promise<{ 
     }
 
     return (
-        <div className="container mx-auto max-w-4xl py-8 space-y-6">
+        <div className="container mx-auto max-w-4xl py-8 px-4 space-y-6">
             {/* Header */}
             <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex-1">
+                        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
                             {transcription.audioFile.originalFilename || "Shared Transcription"}
                         </h1>
-                        <div className="mt-2 flex flex-wrap gap-4 text-sm text-muted-foreground">
+                        <div className="mt-2 flex flex-wrap gap-2 sm:gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
                                 <Calendar className="h-4 w-4" />
                                 <span>{format(new Date(transcription.createdAt), "PPP")}</span>

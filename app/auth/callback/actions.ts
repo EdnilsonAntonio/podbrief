@@ -18,13 +18,23 @@ export async function checkAuthStatus() {
 
   // Se não existir na DB, então crie o usuário (Sign Up)
   if (!existingUser) {
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         email: user.email,
         name:
           [user.given_name, user.family_name].filter(Boolean).join(" ") || null,
         imageUrl: user.picture || null,
       },
+    });
+
+    // Enviar email de boas-vindas (assíncrono, não bloqueia)
+    import("@/lib/emails").then(({ sendWelcomeEmail }) => {
+      sendWelcomeEmail({
+        to: newUser.email,
+        name: newUser.name,
+      }).catch((error) => {
+        console.error("Failed to send welcome email:", error);
+      });
     });
   }
 

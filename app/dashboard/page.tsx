@@ -4,10 +4,14 @@ import { CreditCard } from "@/components/dashboard/CreditCard";
 import { TranscriptionCard } from "@/components/dashboard/TranscriptionCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, FileAudio, TrendingUp } from "lucide-react";
+import { Upload, FileAudio, TrendingUp, ShoppingCart, Zap } from "lucide-react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface User {
     id: string;
@@ -47,25 +51,69 @@ async function fetchTranscriptions(): Promise<Transcription[]> {
 }
 
 export default function DashboardPage() {
-    const { data: user, isLoading: isLoadingUser } = useQuery({
+    const searchParams = useSearchParams();
+    const paymentStatus = searchParams.get("payment");
+
+    useEffect(() => {
+        if (paymentStatus === "success") {
+            toast.success("Payment successful! Credits have been added to your account.");
+            // Refetch user data to update credits
+            setTimeout(() => {
+                window.location.href = "/dashboard";
+            }, 2000);
+        }
+    }, [paymentStatus]);
+
+    const { data: user, isLoading: isLoadingUser, refetch: refetchUser } = useQuery({
         queryKey: ["user"],
         queryFn: fetchUser,
     });
 
-    const { data: transcriptions, isLoading: isLoadingTranscriptions } = useQuery({
+    const { data: transcriptions, isLoading: isLoadingTranscriptions, refetch: refetchTranscriptions } = useQuery({
         queryKey: ["transcriptions"],
         queryFn: fetchTranscriptions,
-        refetchInterval: (data) => {
-            // Se houver transcrições em processamento, atualizar a cada 3 segundos
+        refetchInterval: (query) => {
+            // Se houver transcrições em processamento, atualizar a cada 2 segundos
+            const data = query.state.data;
             if (!data || !Array.isArray(data)) {
                 return false;
             }
             const hasProcessing = data.some(
                 (t: Transcription) => t.audioFile.status === "processing" || t.audioFile.status === "pending"
             );
-            return hasProcessing ? 3000 : false;
+            return hasProcessing ? 2000 : false;
         },
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
+        staleTime: 0, // Sempre considerar os dados como stale para forçar refetch
     });
+
+    // Monitorar mudanças nas transcrições e forçar refetch quando necessário
+    // Usamos audioFile.id como identificador único, pois o id da transcrição muda quando completa
+    const previousTranscriptionsRef = useRef<Transcription[] | undefined>(undefined);
+    useEffect(() => {
+        if (transcriptions && previousTranscriptionsRef.current) {
+            // Criar map de status anterior usando audioFile.id como chave
+            const previousStatuses = new Map(
+                previousTranscriptionsRef.current.map((t) => [t.audioFile.id, t.audioFile.status])
+            );
+            
+            // Verificar se alguma transcrição mudou de status ou se uma nova transcrição apareceu
+            const hasStatusChanged = transcriptions.some((t) => {
+                const previousStatus = previousStatuses.get(t.audioFile.id);
+                // Se não tinha status anterior, é uma nova transcrição
+                // Se tinha status anterior e mudou, houve mudança
+                return !previousStatus || previousStatus !== t.audioFile.status;
+            });
+
+            // Se houve mudança de status ou nova transcrição, forçar refetch
+            if (hasStatusChanged) {
+                // Forçar refetch imediatamente para pegar a última versão
+                refetchTranscriptions();
+            }
+        }
+        previousTranscriptionsRef.current = transcriptions;
+    }, [transcriptions, refetchTranscriptions]);
 
     const recentTranscriptions = transcriptions?.slice(0, 3) || [];
     const totalTranscriptions = transcriptions?.filter(
@@ -102,15 +150,40 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                <p className="text-muted-foreground">
-                    Welcome back! Here's an overview of your account.
-                </p>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+                    <p className="text-muted-foreground">
+                        Welcome back! Here's an overview of your account.
+                    </p>
+                </div>
+                <Button asChild className="w-full sm:w-auto">
+                    <Link href="/pricing">
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        Purchase Credits
+                    </Link>
+                </Button>
             </div>
 
+            {/* Low Credits Alert */}
+            {user && user.credits < 10 && (
+                <Alert className="border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950">
+                    <Zap className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                    <AlertTitle className="text-orange-900 dark:text-orange-100">
+                        Low Credits
+                    </AlertTitle>
+                    <AlertDescription className="text-orange-800 dark:text-orange-200">
+                        You have {user.credits % 1 === 0 ? user.credits.toFixed(0) : user.credits.toFixed(2)} credits remaining.{" "}
+                        <Link href="/pricing" className="font-semibold underline hover:no-underline">
+                            Purchase more credits
+                        </Link>{" "}
+                        to continue transcribing your audio files.
+                    </AlertDescription>
+                </Alert>
+            )}
+
             {/* Overview Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 <CreditCard credits={user?.credits || 0} plan={undefined} />
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -154,19 +227,19 @@ export default function DashboardPage() {
 
             {/* Recent Transcriptions */}
             <div>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h2 className="text-2xl font-bold tracking-tight">Recent Transcriptions</h2>
                         <p className="text-muted-foreground">
                             Your latest audio transcriptions and summaries
                         </p>
                     </div>
-                    <Button asChild variant="outline">
+                    <Button asChild variant="outline" className="w-full sm:w-auto">
                         <Link href="/dashboard/transcriptions">View All</Link>
                     </Button>
                 </div>
                     {recentTranscriptions.length > 0 ? (
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                             {recentTranscriptions.map((transcription: Transcription) => {
                                 // Para transcrições completas, usar o ID da Transcription
                                 // Para itens em processamento, o ID é do AudioFile (será resolvido pela API)

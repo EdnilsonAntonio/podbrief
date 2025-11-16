@@ -53,7 +53,12 @@ export default function UploadPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || "Upload failed");
+                // Tratar rate limit especificamente
+                if (response.status === 429) {
+                    const resetTime = data.reset ? new Date(data.reset).toLocaleTimeString() : "later";
+                    throw new Error(data.message || `Upload limit exceeded. Please try again after ${resetTime}`);
+                }
+                throw new Error(data.error || data.message || "Upload failed");
             }
 
             toast.success("File uploaded successfully! Processing transcription...");
@@ -105,7 +110,7 @@ export default function UploadPage() {
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
                             onDrop={handleDrop}
-                            className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors ${isDragOver
+                            className={`border-2 border-dashed rounded-lg p-6 sm:p-12 text-center cursor-pointer transition-colors ${isDragOver
                                     ? "border-primary bg-primary/5"
                                     : "border-muted-foreground/25 hover:border-primary/50"
                                 }`}
