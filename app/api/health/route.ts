@@ -15,9 +15,10 @@ export async function GET() {
   };
 
   try {
-    // Verificar conexão com banco de dados
+    // Verificar conexão com banco de dados (MongoDB)
     try {
-      await prisma.$queryRaw`SELECT 1`;
+      // Para MongoDB, fazemos uma query simples para verificar a conexão
+      await prisma.$runCommandRaw({ ping: 1 });
       health.checks.database = "healthy";
     } catch (error) {
       health.checks.database = "unhealthy";

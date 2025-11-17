@@ -92,7 +92,9 @@ export async function checkDiskSpace() {
     }
   } catch (error) {
     // Ignorar erros de verificação de disco (pode não funcionar em todos os ambientes)
-    log(LogLevel.WARN, "Could not check disk space", { error });
+    log(LogLevel.WARN, "Could not check disk space", { 
+      error: error instanceof Error ? error : new Error(String(error))
+    });
   }
 }
 
@@ -125,10 +127,7 @@ export function logApiError(
 ) {
   log(LogLevel.ERROR, `API error: ${endpoint}`, {
     endpoint,
-    error: {
-      message: error.message,
-      stack: error.stack,
-    },
+    error: error instanceof Error ? error : new Error(String(error)),
     ...context,
   });
 }

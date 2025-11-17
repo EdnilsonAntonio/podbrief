@@ -79,7 +79,9 @@ export async function GET(
       `attachment; filename="invoice-${invoice.id}.pdf"`
     );
 
-    return new NextResponse(pdfBuffer, { headers });
+    // Converter Buffer para Uint8Array para compatibilidade com NextResponse
+    const pdfArray = new Uint8Array(pdfBuffer);
+    return new NextResponse(pdfArray, { headers });
   } catch (error) {
     console.error("Error downloading invoice:", error);
     return NextResponse.json(

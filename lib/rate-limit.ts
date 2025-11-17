@@ -5,17 +5,18 @@ import { Redis } from "@upstash/redis";
 // Em produção, você precisa configurar Upstash Redis ou usar outro serviço
 
 let ratelimit: Ratelimit | null = null;
+let redisInstance: Redis | null = null;
 
 // Inicializar rate limiter apenas se tiver as variáveis de ambiente
 if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
-  const redis = new Redis({
+  redisInstance = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL,
     token: process.env.UPSTASH_REDIS_REST_TOKEN,
   });
 
   // Rate limiter para uploads: 10 uploads por hora por usuário
   ratelimit = new Ratelimit({
-    redis,
+    redis: redisInstance,
     limiter: Ratelimit.slidingWindow(10, "1 h"),
     analytics: true,
   });
@@ -60,8 +61,12 @@ export async function checkApiRateLimit(
   }
 
   // Criar limiter dinâmico
+  if (!redisInstance) {
+    return { success: true, limit, remaining: limit, reset: Date.now() + 3600000 };
+  }
+
   const dynamicLimiter = new Ratelimit({
-    redis: ratelimit.redis,
+    redis: redisInstance,
     limiter: Ratelimit.slidingWindow(limit, window as any),
     analytics: true,
   });

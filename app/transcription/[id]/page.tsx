@@ -36,6 +36,8 @@ interface TranscriptionData {
     text: string;
     costCredits: number;
     createdAt: Date;
+    isPublic: boolean;
+    shareToken: string | null;
     audioFile: {
         id: string;
         originalFilename: string | null;

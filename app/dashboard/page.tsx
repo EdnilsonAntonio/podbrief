@@ -8,7 +8,7 @@ import { Upload, FileAudio, TrendingUp, ShoppingCart, Zap } from "lucide-react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -50,7 +50,7 @@ async function fetchTranscriptions(): Promise<Transcription[]> {
     return response.json();
 }
 
-export default function DashboardPage() {
+function DashboardContent() {
     const searchParams = useSearchParams();
     const paymentStatus = searchParams.get("payment");
 
@@ -316,6 +316,33 @@ export default function DashboardPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function DashboardPage() {
+    return (
+        <Suspense fallback={
+            <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="space-y-2">
+                    <Skeleton className="h-9 w-64" />
+                    <Skeleton className="h-5 w-96 max-w-full" />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="rounded-lg border p-4 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="h-8 w-8 rounded-lg" />
+                            </div>
+                            <Skeleton className="h-8 w-16" />
+                            <Skeleton className="h-3 w-32" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        }>
+            <DashboardContent />
+        </Suspense>
     );
 }
 
