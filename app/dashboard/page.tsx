@@ -126,21 +126,43 @@ export default function DashboardPage() {
 
     if (isLoadingUser || isLoadingTranscriptions) {
         return (
-            <div className="space-y-6">
-                <div>
-                    <Skeleton className="h-9 w-64 mb-2" />
-                    <Skeleton className="h-5 w-96" />
+            <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="space-y-2">
+                    <Skeleton className="h-9 w-64" />
+                    <Skeleton className="h-5 w-96 max-w-full" />
                 </div>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {[1, 2, 3, 4].map((i) => (
-                        <Skeleton key={i} className="h-32" />
+                        <div key={i} className="rounded-lg border p-4 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="h-8 w-8 rounded-lg" />
+                            </div>
+                            <Skeleton className="h-8 w-16" />
+                            <Skeleton className="h-3 w-32" />
+                        </div>
                     ))}
                 </div>
                 <div className="space-y-4">
-                    <Skeleton className="h-8 w-64" />
+                    <div className="space-y-2">
+                        <Skeleton className="h-8 w-64" />
+                        <Skeleton className="h-4 w-96 max-w-full" />
+                    </div>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                         {[1, 2, 3].map((i) => (
-                            <Skeleton key={i} className="h-48" />
+                            <div key={i} className="rounded-lg border p-6 space-y-4">
+                                <div className="flex items-start justify-between">
+                                    <div className="space-y-2 flex-1">
+                                        <Skeleton className="h-5 w-3/4" />
+                                        <Skeleton className="h-4 w-1/2" />
+                                    </div>
+                                    <Skeleton className="h-6 w-16 rounded-full" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-full" />
+                                    <Skeleton className="h-4 w-2/3" />
+                                </div>
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -185,20 +207,24 @@ export default function DashboardPage() {
             {/* Overview Cards */}
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 <CreditCard credits={user?.credits || 0} plan={undefined} />
-                <Card>
+                <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Transcriptions</CardTitle>
-                        <FileAudio className="h-4 w-4 text-muted-foreground" />
+                        <div className="rounded-lg bg-primary/10 p-2 group-hover:bg-primary/20 transition-colors">
+                            <FileAudio className="h-4 w-4 text-primary" />
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{totalTranscriptions}</div>
                         <p className="text-xs text-muted-foreground">Completed successfully</p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-primary/20">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Credits Used</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                        <div className="rounded-lg bg-primary/10 p-2 group-hover:bg-primary/20 transition-colors">
+                            <TrendingUp className="h-4 w-4 text-primary" />
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
@@ -209,13 +235,15 @@ export default function DashboardPage() {
                         <p className="text-xs text-muted-foreground">All time</p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-primary/20">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Quick Actions</CardTitle>
-                        <Upload className="h-4 w-4 text-muted-foreground" />
+                        <div className="rounded-lg bg-primary/10 p-2 group-hover:bg-primary/20 transition-colors">
+                            <Upload className="h-4 w-4 text-primary" />
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <Button asChild className="w-full">
+                        <Button asChild className="w-full shadow-sm hover:shadow-md transition-shadow">
                             <Link href="/dashboard/upload">
                                 <Upload className="mr-2 h-4 w-4" />
                                 Upload Audio
@@ -268,9 +296,23 @@ export default function DashboardPage() {
                             })}
                         </div>
                 ) : (
-                    <div className="text-center py-12 border rounded-lg">
-                        <p className="text-muted-foreground">No transcriptions yet. Upload an audio file to get started!</p>
-                    </div>
+                    <Card className="border-dashed">
+                        <CardContent className="flex flex-col items-center justify-center py-12">
+                            <div className="rounded-full bg-primary/10 p-4 mb-4">
+                                <FileAudio className="h-8 w-8 text-primary" />
+                            </div>
+                            <h3 className="text-lg font-semibold mb-2">No transcriptions yet</h3>
+                            <p className="text-muted-foreground text-center mb-4 max-w-sm">
+                                Upload your first audio file to get started with AI-powered transcriptions and summaries.
+                            </p>
+                            <Button asChild>
+                                <Link href="/dashboard/upload">
+                                    <Upload className="mr-2 h-4 w-4" />
+                                    Upload Audio
+                                </Link>
+                            </Button>
+                        </CardContent>
+                    </Card>
                 )}
             </div>
         </div>

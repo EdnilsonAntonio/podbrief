@@ -317,7 +317,7 @@ async function generateInvoicePDF(
             alignment: "center",
           },
           {
-            text: "For support, please contact us at support@podbrief.com",
+            text: "For support, please contact us at support@podbrief.online",
             fontSize: 8,
             alignment: "center",
           },

@@ -36,18 +36,39 @@ RESEND_FROM_EMAIL=onboarding@resend.dev
 
 #### Opção B: Verificar seu domínio (produção)
 
-1. Vá para [Domains](https://resend.com/domains) no Resend
-2. Clique em "Add Domain"
-3. Adicione seu domínio (ex: `podbrief.com`)
-4. Siga as instruções para adicionar os registros DNS:
-   - SPF record
-   - DKIM records
-   - DMARC record (opcional)
-5. Após verificação, use: `noreply@seudominio.com`
-6. Adicione ao `.env`:
-   ```env
-   RESEND_FROM_EMAIL=noreply@seudominio.com
-   ```
+**Para o domínio `podbrief.online`:**
+
+1. Acesse o painel do Resend: [Domains](https://resend.com/domains)
+2. Clique em **"Add Domain"**
+3. Digite seu domínio: `podbrief.online` (sem www)
+4. Clique em **"Add"**
+5. O Resend irá gerar os registros DNS necessários. Você verá uma lista com:
+
+   - **SPF record** (TXT) - para autenticação de email
+   - **DKIM records** (CNAME) - geralmente 2 registros para verificação
+   - **DMARC record** (TXT) - opcional, mas recomendado para segurança
+
+6. **Adicione os registros DNS no seu provedor de domínio:**
+
+   - Acesse o painel de DNS do seu provedor (onde você comprou o domínio)
+   - Adicione cada registro exatamente como mostrado no Resend
+   - **Importante**: Os registros CNAME do DKIM podem levar alguns minutos para propagar
+
+7. **Aguarde a verificação:**
+
+   - O Resend verifica automaticamente os registros DNS
+   - Pode levar de alguns minutos até 24 horas para propagar
+   - Você pode verificar o status na página de Domains do Resend
+   - Quando estiver verificado, o status mudará para "Verified" (verificado)
+
+8. **Após verificação, configure o email do remetente:**
+   - Use um endereço como: `noreply@podbrief.online` ou `hello@podbrief.online`
+   - Adicione ao seu arquivo `.env`:
+     ```env
+     RESEND_FROM_EMAIL=noreply@podbrief.online
+     ```
+
+**Dica**: Se você já tem outros registros DNS no seu domínio, certifique-se de não criar conflitos. O Resend mostrará exatamente quais registros adicionar.
 
 ### 3. Emails Implementados
 
@@ -77,6 +98,14 @@ O sistema envia automaticamente os seguintes emails:
 - **Local**: `app/api/user/delete/route.ts`
 - **Conteúdo**: Confirmação de exclusão e agradecimento
 
+#### 5. Email do Formulário de Contato
+
+- **Quando**: Quando um usuário envia mensagem através do formulário de contato
+- **Local**: `app/api/contact/route.ts`
+- **Destino**: `support@podbrief.online`
+- **Conteúdo**: Nome, email, assunto e mensagem do usuário
+- **Reply-To**: Email do usuário (permite responder diretamente)
+
 ### 4. Testar os Emails
 
 1. Certifique-se de que as variáveis de ambiente estão configuradas
@@ -86,12 +115,142 @@ O sistema envia automaticamente os seguintes emails:
    - Comprar créditos → Email de confirmação
    - Usar créditos até ficar < 10 → Email de créditos baixos
    - Deletar conta → Email de despedida
+   - Enviar mensagem pelo formulário de contato → Email para support@podbrief.online
 
 ### 5. Monitoramento
 
 - Acesse [Logs](https://resend.com/emails) no Resend para ver o status dos emails
 - Verifique os logs do servidor para erros de envio
 - Emails são enviados de forma assíncrona e não bloqueiam as operações principais
+
+### 6. Troubleshooting - Formulário de Contato
+
+Se você não está recebendo emails do formulário de contato em `support@podbrief.online`:
+
+#### Passo 1: Verificar os Logs do Servidor
+
+1. Envie uma mensagem pelo formulário de contato
+2. Verifique os logs do servidor (terminal onde está rodando `npm run dev`)
+3. Procure por mensagens como:
+   - `📧 Sending contact form email:` - confirma que está tentando enviar
+   - `✅ Contact form email sent successfully` - confirma sucesso
+   - `❌ Error sending contact form email:` - indica erro
+
+#### Passo 2: Verificar no Painel do Resend
+
+1. Acesse [Resend Emails](https://resend.com/emails)
+2. Procure por emails enviados recentemente
+3. Verifique o status de cada email:
+   - ✅ **Delivered** - Email foi entregue (pode estar em spam)
+   - ⚠️ **Bounced** - Email foi rejeitado
+   - ❌ **Failed** - Falha no envio
+
+#### Passo 3: Configurar Recebimento de Emails para `support@podbrief.online`
+
+**⚠️ IMPORTANTE:** O Resend **envia** emails, mas **não recebe** emails. Você precisa configurar onde os emails enviados para `support@podbrief.online` devem ser entregues.
+
+##### Opção A: Usar Encaminhamento de Email (Recomendado)
+
+Se você já tem um email pessoal (Gmail, Outlook, etc.), configure o encaminhamento:
+
+1. **No seu provedor de domínio** (onde você comprou o domínio):
+
+   - Acesse as configurações de email/email forwarding
+   - Configure para encaminhar `support@podbrief.online` → `seu-email@gmail.com` (ou outro email)
+   - Salve as alterações
+
+2. **Alternativa - Usar Gmail com domínio personalizado:**
+   - Configure o Gmail para receber emails de `podbrief.online`
+   - Adicione `support@podbrief.online` como alias no Gmail
+   - Configure os registros MX do domínio para apontar para o Gmail
+
+##### Opção B: Usar Serviço de Email Profissional
+
+Configure um serviço de email profissional para o domínio:
+
+1. **Google Workspace** (antigo G Suite):
+
+   - Configure os registros MX do domínio
+   - Crie a conta `support@podbrief.online`
+   - Os emails serão entregues normalmente
+
+2. **Microsoft 365 / Outlook:**
+
+   - Configure os registros MX do domínio
+   - Crie a conta `support@podbrief.online`
+
+3. **Outros provedores:**
+   - Zoho Mail, ProtonMail Business, etc.
+   - Siga as instruções de cada serviço para configurar os registros MX
+
+##### Opção C: Verificar Registros MX do Domínio
+
+Os registros MX (Mail Exchange) determinam onde os emails do domínio são entregues:
+
+1. Verifique os registros MX atuais do domínio:
+
+   ```bash
+   # No terminal, execute:
+   dig MX podbrief.online
+   # ou use ferramentas online como: https://mxtoolbox.com/
+   ```
+
+2. Se não houver registros MX configurados, os emails não serão entregues
+3. Configure os registros MX apontando para o seu provedor de email
+
+##### Verificar Status no Resend
+
+1. Acesse [Resend Emails](https://resend.com/emails)
+2. Clique no email enviado para ver detalhes
+3. Verifique o status:
+   - **"Delivered"** = Email foi entregue ao servidor de destino (pode estar em spam ou não configurado)
+   - **"Bounced"** = Email foi rejeitado (verifique os registros MX)
+   - **"Failed"** = Falha no envio
+
+#### Passo 5: Testar com Outro Email (Solução Temporária)
+
+Para testar se o problema é específico do `support@podbrief.online`, você pode temporariamente mudar o destino:
+
+1. Adicione ao `.env`:
+
+   ```env
+   SUPPORT_EMAIL=seu-email-pessoal@gmail.com
+   ```
+
+2. Teste novamente o formulário
+
+3. Se funcionar, confirma que o problema está na configuração de recebimento do `support@podbrief.online`
+
+#### Passo 4: Verificar Pasta de Spam
+
+- Verifique a pasta de spam/lixo eletrônico do email de destino (se configurou encaminhamento)
+- Marque como "Não é spam" se encontrar os emails lá
+- Adicione `noreply@podbrief.online` à lista de contatos confiáveis
+
+#### Passo 6: Solução Rápida - Usar Email Pessoal Temporariamente
+
+Se você precisa receber os emails imediatamente enquanto configura o `support@podbrief.online`:
+
+1. Adicione ao `.env`:
+
+   ```env
+   SUPPORT_EMAIL=seu-email-pessoal@gmail.com
+   ```
+
+2. Reinicie o servidor
+
+3. Os emails do formulário serão enviados para seu email pessoal
+
+4. Depois que configurar o recebimento de emails para `support@podbrief.online`, remova essa variável ou altere para `support@podbrief.online`
+
+#### Passo 7: Verificar Erros Específicos
+
+Se os logs mostram erros, verifique:
+
+- **"Invalid 'to' field"** - O endereço de email está incorreto
+- **"Domain not verified"** - O domínio precisa ser verificado primeiro
+- **"Rate limit exceeded"** - Você excedeu o limite de emails
+- **"Forbidden"** - Problema com a API key ou permissões
 
 ## Estrutura dos Arquivos
 
@@ -104,6 +263,11 @@ lib/
     purchase-confirmation.ts   # Email de confirmação de compra
     low-credits.ts            # Email de créditos baixos
     goodbye.ts                # Email de despedida
+    contact-form.ts           # Email do formulário de contato
+app/
+  api/
+    contact/
+      route.ts                 # API route para receber formulário de contato
 ```
 
 ## Notas Importantes
@@ -112,3 +276,4 @@ lib/
 - Erros no envio de emails são logados mas não interrompem o fluxo
 - O email de créditos baixos só é enviado quando os créditos ficam < 10 após uma transcrição
 - Para produção, certifique-se de verificar seu domínio no Resend
+- O email do formulário de contato é enviado para `support@podbrief.online` e inclui o email do remetente no campo Reply-To, permitindo responder diretamente ao usuário

@@ -22,14 +22,28 @@ export function ContactForm() {
     setIsSubmitting(true);
 
     try {
-      // Por enquanto, apenas mostra uma mensagem de sucesso
-      // Você pode implementar uma API route para enviar emails depois
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send message");
+      }
+
       toast.success("Thank you for your message! We'll get back to you soon.");
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
-      toast.error("Failed to send message. Please try again.");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to send message. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }

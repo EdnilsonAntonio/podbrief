@@ -175,8 +175,8 @@ export default async function PrivacyPage() {
                 <h2 className="text-2xl font-semibold">10. Contact Us</h2>
                 <p className="text-muted-foreground">
                   If you have any questions about this Privacy Policy, please contact us at{" "}
-                  <a href="mailto:support@podbrief.com" className="text-primary hover:underline">
-                    support@podbrief.com
+                  <a href="mailto:support@podbrief.online" className="text-primary hover:underline">
+                    support@podbrief.online
                   </a>
                   {" "}or visit our{" "}
                   <Link href="/contact" className="text-primary hover:underline">

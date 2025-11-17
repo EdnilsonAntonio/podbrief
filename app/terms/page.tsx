@@ -188,8 +188,8 @@ export default async function TermsPage() {
                 <h2 className="text-2xl font-semibold">13. Contact Information</h2>
                 <p className="text-muted-foreground">
                   If you have any questions about these Terms of Service, please contact us at{" "}
-                  <a href="mailto:support@podbrief.com" className="text-primary hover:underline">
-                    support@podbrief.com
+                  <a href="mailto:support@podbrief.online" className="text-primary hover:underline">
+                    support@podbrief.online
                   </a>
                   {" "}or visit our{" "}
                   <Link href="/contact" className="text-primary hover:underline">

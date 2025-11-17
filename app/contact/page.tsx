@@ -82,8 +82,8 @@ export default async function ContactPage() {
                   <div>
                     <h3 className="font-semibold mb-1">Email</h3>
                     <p className="text-sm text-muted-foreground">
-                      <a href="mailto:support@podbrief.com" className="hover:underline">
-                        support@podbrief.com
+                      <a href="mailto:support@podbrief.online" className="hover:underline">
+                        support@podbrief.online
                       </a>
                     </p>
                   </div>

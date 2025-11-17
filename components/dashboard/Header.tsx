@@ -52,8 +52,8 @@ export function DashboardHeader() {
             <div className="container flex h-16 items-center justify-between px-4">
                 <div className="flex items-center gap-2">
                     <MobileMenuButton />
-                    <Link href="/dashboard" className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                    <Link href="/dashboard" className="flex items-center gap-2" aria-label="PodBrief Home">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground" aria-hidden="true">
                             <span className="text-lg font-bold">PB</span>
                         </div>
                         <span className="hidden text-xl font-bold sm:inline">PodBrief</span>
@@ -63,10 +63,10 @@ export function DashboardHeader() {
                 <div className="flex items-center gap-2 sm:gap-4">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                            <Button variant="ghost" className="relative h-10 w-10 rounded-full" aria-label="User menu">
                                 <Avatar className="h-10 w-10">
-                                    <AvatarImage src={displayImage} alt={displayName} />
-                                    <AvatarFallback>
+                                    <AvatarImage src={displayImage} alt={`${displayName}'s profile picture`} />
+                                    <AvatarFallback aria-hidden="true">
                                         {avatarFallback}
                                     </AvatarFallback>
                                 </Avatar>

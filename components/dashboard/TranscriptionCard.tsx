@@ -66,11 +66,11 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
     };
 
     return (
-        <Card>
+        <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-primary/20 focus-within:ring-2 focus-within:ring-primary/20">
             <CardHeader>
                 <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                        <div className="rounded-lg bg-primary/10 p-2">
+                        <div className="rounded-lg bg-primary/10 p-2 group-hover:bg-primary/20 transition-colors">
                             <FileAudio className="h-5 w-5 text-primary" />
                         </div>
                         <div className="flex-1">
@@ -102,7 +102,7 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
             </CardContent>
             {transcription.status === "completed" && (
                 <CardFooter className="flex gap-2">
-                    <Button asChild variant="outline" size="sm" className="flex-1">
+                    <Button asChild variant="outline" size="sm" className="flex-1 hover:bg-accent/50 transition-colors">
                         <Link href={`/transcription/${transcription.id}`}>
                             <Eye className="mr-2 h-4 w-4" />
                             View
@@ -110,7 +110,7 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
                     </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="flex-1">
+                            <Button variant="outline" size="sm" className="flex-1 hover:bg-accent/50 transition-colors">
                                 <Download className="mr-2 h-4 w-4" />
                                 Download
                             </Button>

@@ -98,23 +98,32 @@ export default function PricingPage() {
                     {PRICING_PLANS.map((plan) => (
                         <Card
                             key={plan.id}
-                            className={plan.popular ? "border-primary shadow-lg" : ""}
+                            className={`group transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full flex flex-col ${
+                                plan.popular 
+                                  ? "border-primary shadow-lg border-2 relative overflow-hidden" 
+                                  : "hover:border-primary/30"
+                            }`}
                         >
-                            <CardHeader>
-                                {plan.popular && (
-                                    <Badge className="mb-2 w-fit">Popular</Badge>
-                                )}
-                                <CardTitle>{plan.name}</CardTitle>
+                            {plan.popular && (
+                                <>
+                                    <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-bl-lg z-10">
+                                        Popular
+                                    </div>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-50" />
+                                </>
+                            )}
+                            <CardHeader className="relative">
+                                <CardTitle className="text-xl">{plan.name}</CardTitle>
                                 <div className="mt-4">
                                     <span className="text-3xl font-bold">${plan.price}</span>
-                                    <span className="text-muted-foreground">/month</span>
+                                    <p className="text-xs text-muted-foreground mt-1">Final price at checkout</p>
                                 </div>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-2">
+                            <CardContent className="space-y-4 relative flex-1 flex flex-col">
+                                <div className="space-y-2 flex-1">
                                     <div className="flex items-center gap-2">
                                         <Zap className="h-4 w-4 text-primary" />
-                                        <span className="text-sm">{plan.credits} Credits</span>
+                                        <span className="text-sm font-medium">{plan.credits} Credits</span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Check className="h-4 w-4 text-primary" />
@@ -135,10 +144,15 @@ export default function PricingPage() {
                                 </div>
                                 {isLoggedIn ? (
                                     <Button
-                                        className="w-full"
+                                        className={`w-full ${
+                                            plan.popular 
+                                                ? "shadow-md hover:shadow-lg" 
+                                                : "hover:bg-accent/50"
+                                        } transition-all`}
                                         variant={plan.popular ? "default" : "outline"}
                                         onClick={() => handlePurchase(plan.id)}
                                         disabled={loadingPlanId !== null}
+                                        size="lg"
                                     >
                                         {loadingPlanId === plan.id ? (
                                             <>
@@ -151,7 +165,15 @@ export default function PricingPage() {
                                     </Button>
                                 ) : (
                                     <LoginLink>
-                                        <Button className="w-full" variant={plan.popular ? "default" : "outline"}>
+                                        <Button 
+                                            className={`w-full ${
+                                                plan.popular 
+                                                    ? "shadow-md hover:shadow-lg" 
+                                                    : "hover:bg-accent/50"
+                                            } transition-all`}
+                                            variant={plan.popular ? "default" : "outline"}
+                                            size="lg"
+                                        >
                                             Get Started
                                         </Button>
                                     </LoginLink>
@@ -161,13 +183,17 @@ export default function PricingPage() {
                     ))}
                 </div>
 
-                <div className="rounded-lg border bg-muted p-8 text-center max-w-2xl mx-auto">
-                    <h3 className="text-xl font-semibold mb-2">Need more?</h3>
-                    <p className="text-muted-foreground mb-4">
-                        Contact us for custom enterprise plans with unlimited credits and dedicated support.
-                    </p>
-                    <Button variant="outline">Contact Sales</Button>
-                </div>
+                <Card className="max-w-2xl mx-auto border-2 hover:border-primary/30 transition-colors">
+                    <CardContent className="p-8 text-center">
+                        <h3 className="text-xl font-semibold mb-2">Need more?</h3>
+                        <p className="text-muted-foreground mb-4">
+                            Contact us for custom enterprise plans with unlimited credits and dedicated support.
+                        </p>
+                        <Button asChild variant="outline" className="hover:bg-accent/50 transition-colors">
+                            <Link href="/contact">Contact Sales</Link>
+                        </Button>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );

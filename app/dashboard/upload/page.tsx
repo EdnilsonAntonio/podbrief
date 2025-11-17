@@ -4,14 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload, FileAudio, X } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Upload, FileAudio, X, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function UploadPage() {
     const router = useRouter();
     const [file, setFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [error, setError] = useState<string | null>(null);
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -40,25 +44,61 @@ export default function UploadPage() {
         if (!file) return;
 
         setIsUploading(true);
+        setError(null);
+        setUploadProgress(0);
 
         try {
             const formData = new FormData();
             formData.append("file", file);
+
+            // Simular progresso durante upload (para arquivos grandes)
+            const progressInterval = setInterval(() => {
+                setUploadProgress((prev) => {
+                    if (prev >= 90) {
+                        clearInterval(progressInterval);
+                        return 90;
+                    }
+                    return prev + 10;
+                });
+            }, 200);
 
             const response = await fetch("/api/upload", {
                 method: "POST",
                 body: formData,
             });
 
+            clearInterval(progressInterval);
+            setUploadProgress(100);
+
             const data = await response.json();
 
             if (!response.ok) {
-                // Tratar rate limit especificamente
+                // Tratar diferentes tipos de erro com mensagens específicas
                 if (response.status === 429) {
                     const resetTime = data.reset ? new Date(data.reset).toLocaleTimeString() : "later";
-                    throw new Error(data.message || `Upload limit exceeded. Please try again after ${resetTime}`);
+                    const errorMsg = `Upload limit exceeded. You can upload up to 10 files per hour. Please try again after ${resetTime}.`;
+                    setError(errorMsg);
+                    throw new Error(errorMsg);
+                } else if (response.status === 400) {
+                    if (data.error === "Insufficient credits") {
+                        const errorMsg = "You don't have enough credits to transcribe this file. Please purchase more credits.";
+                        setError(errorMsg);
+                        throw new Error(errorMsg);
+                    } else if (data.error?.includes("File too large")) {
+                        const errorMsg = "File size exceeds the 500MB limit. Please compress your audio file or split it into smaller parts.";
+                        setError(errorMsg);
+                        throw new Error(errorMsg);
+                    } else if (data.error?.includes("Invalid file type")) {
+                        const errorMsg = "Invalid file type. Please upload an audio file (MP3, WAV, M4A, OGG, or FLAC).";
+                        setError(errorMsg);
+                        throw new Error(errorMsg);
+                    }
+                } else if (response.status === 401) {
+                    const errorMsg = "You need to be logged in to upload files. Please sign in and try again.";
+                    setError(errorMsg);
+                    throw new Error(errorMsg);
                 }
-                throw new Error(data.error || data.message || "Upload failed");
+                throw new Error(data.error || data.message || "Upload failed. Please try again.");
             }
 
             toast.success("File uploaded successfully! Processing transcription...");
@@ -69,10 +109,10 @@ export default function UploadPage() {
             }, 1500);
         } catch (error) {
             console.error("Upload error:", error);
-            toast.error(
-                error instanceof Error ? error.message : "Failed to upload file"
-            );
+            const errorMessage = error instanceof Error ? error.message : "Failed to upload file";
+            toast.error(errorMessage);
             setIsUploading(false);
+            setUploadProgress(0);
         }
     };
 
@@ -131,7 +171,7 @@ export default function UploadPage() {
                                 </p>
                                 <p className="text-xs text-muted-foreground mb-4">or</p>
                                 <Button variant="outline" asChild>
-                                    <label htmlFor="audio-upload" className="cursor-pointer">
+                                    <label htmlFor="audio-upload" className="cursor-pointer" aria-label="Browse files to upload">
                                         Browse Files
                                     </label>
                                 </Button>
@@ -158,6 +198,22 @@ export default function UploadPage() {
                                     <X className="h-4 w-4" />
                                 </Button>
                             </div>
+                            {error && (
+                                <Alert className="border-destructive bg-destructive/10">
+                                    <AlertCircle className="h-4 w-4 text-destructive" />
+                                    <AlertTitle className="text-destructive">Upload Error</AlertTitle>
+                                    <AlertDescription className="text-destructive/90">{error}</AlertDescription>
+                                </Alert>
+                            )}
+                            {isUploading && (
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">Uploading...</span>
+                                        <span className="text-muted-foreground">{uploadProgress}%</span>
+                                    </div>
+                                    <Progress value={uploadProgress} className="h-2" />
+                                </div>
+                            )}
                             <Button
                                 onClick={handleUpload}
                                 disabled={isUploading}
