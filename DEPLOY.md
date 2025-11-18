@@ -47,7 +47,11 @@ STRIPE_PRICE_AGENCY=price_...
 3. Vá em Developers → API keys
 4. Copie as chaves de produção (não use as de teste!)
 5. Crie os produtos de produção (mesmos passos do STRIPE_SETUP.md)
-6. Configure o webhook de produção:
+6. **Configure o webhook de produção** (IMPORTANTE!):
+   - Veja o guia completo em `STRIPE_WEBHOOK_SETUP.md`
+   - URL do webhook: `https://podbrief.online/api/webhooks/stripe`
+   - Eventos necessários: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`
+   - Copie o **Signing secret** (começa com `whsec_`) e adicione como `STRIPE_WEBHOOK_SECRET`
    - Vá em Developers → Webhooks
    - Clique em "Add endpoint" ou "Adicionar destino"
    - Preencha os campos:

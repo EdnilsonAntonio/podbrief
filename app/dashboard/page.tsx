@@ -53,21 +53,42 @@ async function fetchTranscriptions(): Promise<Transcription[]> {
 function DashboardContent() {
     const searchParams = useSearchParams();
     const paymentStatus = searchParams.get("payment");
-
-    useEffect(() => {
-        if (paymentStatus === "success") {
-            toast.success("Payment successful! Credits have been added to your account.");
-            // Refetch user data to update credits
-            setTimeout(() => {
-                window.location.href = "/dashboard";
-            }, 2000);
-        }
-    }, [paymentStatus]);
+    const sessionId = searchParams.get("session_id");
 
     const { data: user, isLoading: isLoadingUser, refetch: refetchUser } = useQuery({
         queryKey: ["user"],
         queryFn: fetchUser,
     });
+
+    useEffect(() => {
+        if (paymentStatus === "success") {
+            // Verificar se os créditos foram adicionados
+            refetchUser();
+            
+            // Se houver session_id, mostrar mensagem com link para verificação
+            if (sessionId) {
+                toast.success("Payment successful! If credits were not added, you can verify the payment manually.", {
+                    action: {
+                        label: "Verify Payment",
+                        onClick: () => {
+                            window.location.href = `/payments/verify?session_id=${sessionId}`;
+                        },
+                    },
+                    duration: 10000,
+                });
+            } else {
+                toast.success("Payment successful! Credits have been added to your account.");
+            }
+            
+            // Limpar URL após 3 segundos
+            setTimeout(() => {
+                const url = new URL(window.location.href);
+                url.searchParams.delete("payment");
+                url.searchParams.delete("session_id");
+                window.history.replaceState({}, "", url.toString());
+            }, 3000);
+        }
+    }, [paymentStatus, sessionId, refetchUser]);
 
     const { data: transcriptions, isLoading: isLoadingTranscriptions, refetch: refetchTranscriptions } = useQuery({
         queryKey: ["transcriptions"],

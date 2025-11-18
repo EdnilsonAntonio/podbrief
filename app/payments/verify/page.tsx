@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,9 +9,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 
 export default function VerifyPaymentPage() {
+  const searchParams = useSearchParams();
   const [sessionId, setSessionId] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+
+  // Preencher session_id da URL se disponível
+  useEffect(() => {
+    const sessionIdFromUrl = searchParams.get("session_id");
+    if (sessionIdFromUrl) {
+      setSessionId(sessionIdFromUrl);
+    }
+  }, [searchParams]);
 
   const handleVerify = async () => {
     if (!sessionId.trim()) {
@@ -54,6 +64,19 @@ export default function VerifyPaymentPage() {
           <CardTitle>Verify Payment</CardTitle>
           <CardDescription>
             If your credits were not added after a successful payment, enter your Stripe session ID here to process it manually.
+            <br />
+            <span className="text-xs text-muted-foreground mt-2 block">
+              💡 <strong>Dica:</strong> O Session ID aparece na URL após o pagamento, ou você pode encontrá-lo em{" "}
+              <a 
+                href="https://dashboard.stripe.com/test/events" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="underline hover:text-primary"
+              >
+                Stripe Dashboard → Developers → Events
+              </a>
+              {" "}procurando por eventos do tipo <code className="bg-muted px-1 rounded">checkout.session.completed</code>
+            </span>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -69,7 +92,13 @@ export default function VerifyPaymentPage() {
               disabled={loading}
             />
             <p className="text-xs text-muted-foreground">
-              You can find this in your Stripe Dashboard → Payments → Checkout Sessions
+              <strong>Onde encontrar:</strong>
+              <br />
+              • Na URL após o pagamento: <code className="bg-muted px-1 rounded">?session_id=cs_test_...</code>
+              <br />
+              • Stripe Dashboard → <strong>Developers</strong> → <strong>Events</strong> → procurar por <code className="bg-muted px-1 rounded">checkout.session.completed</code>
+              <br />
+              • Ou em <strong>Developers</strong> → <strong>Webhooks</strong> → ver eventos recebidos
             </p>
           </div>
 
