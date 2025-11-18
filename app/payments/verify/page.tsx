@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 
-export default function VerifyPaymentPage() {
+function VerifyPaymentContent() {
   const searchParams = useSearchParams();
   const [sessionId, setSessionId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -137,6 +137,23 @@ export default function VerifyPaymentPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function VerifyPaymentPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto py-10 max-w-2xl">
+        <Card>
+          <CardHeader>
+            <CardTitle>Verify Payment</CardTitle>
+            <CardDescription>Loading...</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    }>
+      <VerifyPaymentContent />
+    </Suspense>
   );
 }
 
