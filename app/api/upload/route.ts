@@ -105,10 +105,36 @@ export async function POST(request: NextRequest) {
     });
 
     // Iniciar processamento assíncrono
-    // Não aguardamos o processamento aqui
-    processTranscription(audioFile.id, filepath, file.name).catch((error) => {
-      console.error("Error processing transcription:", error);
-    });
+    // No Vercel, precisamos garantir que o processamento seja executado
+    // Chamamos via fetch para garantir que seja executado em uma nova função
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : process.env.VERCEL 
+        ? `https://${process.env.VERCEL_BRANCH_URL || process.env.VERCEL_URL}` 
+        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    
+    console.log(`🚀 Starting transcription processing for audioFile ${audioFile.id}`);
+    console.log(`🌐 Base URL: ${baseUrl}`);
+    
+    // Chamar endpoint de processamento via fetch (não bloqueia)
+    // Usar setTimeout para garantir que a resposta HTTP seja enviada primeiro
+    setTimeout(() => {
+      fetch(`${baseUrl}/api/transcriptions/process`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          audioFileId: audioFile.id,
+        }),
+      }).catch((error) => {
+        console.error("Error triggering transcription processing:", error);
+        // Fallback: tentar processar diretamente
+        processTranscription(audioFile.id, filepath, file.name).catch((err) => {
+          console.error("Error processing transcription (fallback):", err);
+        });
+      });
+    }, 100);
 
     return NextResponse.json({
       success: true,
