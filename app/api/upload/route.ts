@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Verificar créditos
     if (user.credits <= 0) {
       return NextResponse.json(
-        { error: "Insufficient credits" },
+        { error: "Insufficient credits", message: "You don't have enough credits to transcribe files. Please purchase more credits." },
         { status: 400 }
       );
     }
@@ -73,6 +73,25 @@ export async function POST(request: NextRequest) {
     if (file.size > maxSize) {
       return NextResponse.json(
         { error: "File too large. Maximum size is 500MB." },
+        { status: 400 }
+      );
+    }
+
+    // Estimar duração baseada no tamanho do arquivo (estimativa conservadora: ~1MB por minuto)
+    // Isso ajuda a validar créditos antes de aceitar o upload
+    const estimatedMinutes = file.size / (1024 * 1024); // MB
+    const estimatedCredits = Math.max(0.01, Math.round(estimatedMinutes * 100) / 100);
+    
+    // Verificar se tem créditos suficientes para a estimativa
+    if (user.credits < estimatedCredits) {
+      return NextResponse.json(
+        { 
+          error: "Insufficient credits",
+          message: `This file appears to be approximately ${Math.round(estimatedMinutes)} minutes long, which requires ${estimatedCredits} credits. You currently have ${user.credits} credits. Please purchase more credits to transcribe this file.`,
+          estimatedMinutes: Math.round(estimatedMinutes),
+          estimatedCredits,
+          currentCredits: user.credits
+        },
         { status: 400 }
       );
     }

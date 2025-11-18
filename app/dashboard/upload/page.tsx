@@ -70,7 +70,17 @@ export default function UploadPage() {
             clearInterval(progressInterval);
             setUploadProgress(100);
 
-            const data = await response.json();
+            // Verificar se a resposta é JSON antes de fazer parse
+            let data;
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              data = await response.json();
+            } else {
+              // Se não for JSON, ler como texto para ver o erro
+              const text = await response.text();
+              console.error("Non-JSON response:", text);
+              throw new Error(`Server error: ${text.substring(0, 100)}`);
+            }
 
             if (!response.ok) {
                 // Tratar diferentes tipos de erro com mensagens específicas
@@ -81,7 +91,8 @@ export default function UploadPage() {
                     throw new Error(errorMsg);
                 } else if (response.status === 400) {
                     if (data.error === "Insufficient credits") {
-                        const errorMsg = "You don't have enough credits to transcribe this file. Please purchase more credits.";
+                        // Usar mensagem detalhada do servidor se disponível
+                        const errorMsg = data.message || "You don't have enough credits to transcribe this file. Please purchase more credits.";
                         setError(errorMsg);
                         throw new Error(errorMsg);
                     } else if (data.error?.includes("File too large")) {
