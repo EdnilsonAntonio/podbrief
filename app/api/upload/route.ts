@@ -105,36 +105,14 @@ export async function POST(request: NextRequest) {
     });
 
     // Iniciar processamento assíncrono
-    // No Vercel, precisamos garantir que o processamento seja executado
-    // Chamamos via fetch para garantir que seja executado em uma nova função
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : process.env.VERCEL 
-        ? `https://${process.env.VERCEL_BRANCH_URL || process.env.VERCEL_URL}` 
-        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    
+    // No Vercel, processamos diretamente mas não bloqueamos a resposta
     console.log(`🚀 Starting transcription processing for audioFile ${audioFile.id}`);
-    console.log(`🌐 Base URL: ${baseUrl}`);
     
-    // Chamar endpoint de processamento via fetch (não bloqueia)
-    // Usar setTimeout para garantir que a resposta HTTP seja enviada primeiro
-    setTimeout(() => {
-      fetch(`${baseUrl}/api/transcriptions/process`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          audioFileId: audioFile.id,
-        }),
-      }).catch((error) => {
-        console.error("Error triggering transcription processing:", error);
-        // Fallback: tentar processar diretamente
-        processTranscription(audioFile.id, filepath, file.name).catch((err) => {
-          console.error("Error processing transcription (fallback):", err);
-        });
-      });
-    }, 100);
+    // Processar diretamente (não bloqueia a resposta HTTP)
+    // O Vercel mantém a função ativa enquanto houver trabalho pendente
+    processTranscription(audioFile.id, filepath, file.name).catch((error) => {
+      console.error("Error processing transcription:", error);
+    });
 
     return NextResponse.json({
       success: true,
@@ -156,11 +134,15 @@ async function processTranscription(
   originalFilename: string
 ) {
   try {
+    console.log(`📝 [${audioFileId}] Starting transcription process`);
+    console.log(`📂 [${audioFileId}] File path: ${filepath}`);
+    
     // Atualizar status para processing
     await prisma.audioFile.update({
       where: { id: audioFileId },
       data: { status: "processing" },
     });
+    console.log(`✅ [${audioFileId}] Status updated to processing`);
 
     const audioFile = await prisma.audioFile.findUnique({
       where: { id: audioFileId },
@@ -170,6 +152,8 @@ async function processTranscription(
     if (!audioFile) {
       throw new Error("Audio file not found");
     }
+
+    console.log(`👤 [${audioFileId}] User: ${audioFile.user.email}, Credits: ${audioFile.user.credits}`);
 
     // Verificar créditos novamente
     if (audioFile.user.credits <= 0) {
@@ -186,58 +170,56 @@ async function processTranscription(
     const fs = await import("fs");
     const { createReadStream } = fs;
 
+    // Verificar se o arquivo existe
+    const { existsSync } = await import("fs");
+    if (!existsSync(filepath)) {
+      throw new Error(`File not found: ${filepath}`);
+    }
+    console.log(`📂 [${audioFileId}] File exists, reading stream...`);
+
     // Ler o arquivo como stream
-    // A biblioteca OpenAI SDK aceita streams, buffers, ou File objects
     const fileStream = createReadStream(filepath);
+    console.log(`🎤 [${audioFileId}] Calling OpenAI Whisper API...`);
 
     // Chamar Whisper API
-    // No Node.js, podemos passar o stream diretamente
     const transcriptionResponse = await openai.audio.transcriptions.create({
       file: fileStream as any,
       model: "whisper-1",
       response_format: "verbose_json",
     });
+    
+    console.log(`✅ [${audioFileId}] Transcription received from OpenAI`);
 
     // Extrair o texto da transcrição
-    // verbose_json retorna um objeto com propriedade 'text'
     const transcriptionText = (transcriptionResponse as any).text;
+    console.log(`📄 [${audioFileId}] Transcription text length: ${transcriptionText.length} characters`);
 
     // Obter duração real do áudio
     let durationSeconds = null;
-    let durationMinutes = 0.01; // Default mínimo (1 segundo) se não conseguir obter
+    let durationMinutes = 0.01;
 
     try {
       const { parseFile } = await import("music-metadata");
       const metadata = await parseFile(filepath);
       if (metadata.format.duration) {
         durationSeconds = metadata.format.duration;
-        durationMinutes = durationSeconds / 60; // Converter para minutos com decimais
+        durationMinutes = durationSeconds / 60;
       }
+      console.log(`⏱️ [${audioFileId}] Duration extracted: ${durationSeconds}s (${durationMinutes.toFixed(2)} min)`);
     } catch (metadataError) {
-      console.warn(
-        "Could not extract audio duration, using estimation:",
-        metadataError
-      );
-      // Fallback para estimativa baseada no tamanho (assumindo ~1MB por minuto)
+      console.warn(`⚠️ [${audioFileId}] Could not extract audio duration, using estimation:`, metadataError);
       const estimatedMinutes = (audioFile.sizeBytes || 0) / (1024 * 1024);
       durationMinutes = Math.max(0.01, estimatedMinutes);
     }
 
-    // Calcular créditos (1 crédito = 1 minuto, usando frações)
-    // Arredondar para 2 casas decimais e garantir mínimo de 0.01 crédito
+    // Calcular créditos
     const creditsToDeduct = Math.max(
       0.01,
       Math.round(durationMinutes * 100) / 100
     );
 
     console.log(
-      `Duration: ${
-        durationSeconds ? durationSeconds.toFixed(2) : "N/A"
-      }s (${durationMinutes.toFixed(
-        2
-      )} min), Credits to deduct: ${creditsToDeduct}, Current credits: ${
-        audioFile.user.credits
-      }`
+      `💰 [${audioFileId}] Credits to deduct: ${creditsToDeduct}, Current credits: ${audioFile.user.credits}`
     );
 
     // Verificar se tem créditos suficientes
@@ -251,6 +233,7 @@ async function processTranscription(
     }
 
     // Criar transcrição
+    console.log(`💾 [${audioFileId}] Creating transcription record...`);
     const transcriptionRecord = await prisma.transcription.create({
       data: {
         userId: audioFile.userId,
@@ -259,6 +242,7 @@ async function processTranscription(
         costCredits: creditsToDeduct,
       },
     });
+    console.log(`✅ [${audioFileId}] Transcription record created: ${transcriptionRecord.id}`);
 
     // Debitar créditos (calcular manualmente para garantir precisão com Float)
     const currentCredits = audioFile.user.credits;
@@ -289,22 +273,19 @@ async function processTranscription(
       where: { id: audioFileId },
       data: {
         status: "completed",
-        durationSeconds: durationSeconds || durationMinutes * 60, // Usar duração real ou fallback
+        durationSeconds: durationSeconds || durationMinutes * 60,
       },
     });
+    console.log(`✅ [${audioFileId}] Status updated to completed`);
 
     // Gerar resumo com GPT (assíncrono, não bloqueia)
     generateSummary(transcriptionRecord.id, transcriptionText).catch(
       (error) => {
-        console.error("Error generating summary:", error);
-        // Não falha o processo se o resumo falhar
+        console.error(`❌ [${audioFileId}] Error generating summary:`, error);
       }
     );
 
-    // Não deletar o arquivo imediatamente - manter para o player de áudio
-    // O arquivo será deletado após 7 dias ou quando o usuário deletar a transcrição
-    // Por enquanto, mantemos o arquivo disponível
-
+    console.log(`🎉 [${audioFileId}] Transcription process completed successfully!`);
     return transcriptionRecord;
   } catch (error: any) {
     // Log estruturado do erro
