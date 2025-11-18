@@ -7,7 +7,10 @@ const nextConfig: NextConfig = {
   },
   // Garantir que os arquivos do Prisma sejam incluídos no deploy
   outputFileTracingIncludes: {
-    "/api/**": ["./lib/generated/prisma/**/*"],
+    "/api/**": [
+      "./node_modules/.prisma/client/**/*",
+      "./node_modules/@prisma/client/**/*",
+    ],
   },
 };
 
