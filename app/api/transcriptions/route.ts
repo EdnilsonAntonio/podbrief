@@ -38,7 +38,8 @@ export async function GET(request: NextRequest) {
     // Transformar arquivos em processamento em formato similar para a UI
     // IMPORTANTE: Para itens em processamento, usamos o ID do AudioFile como ID temporário
     // Quando a transcrição for completada, o ID será o da Transcription
-    const processingItems = processingAudioFiles.map((audioFile) => ({
+    type AudioFileType = typeof processingAudioFiles[0];
+    const processingItems = processingAudioFiles.map((audioFile: AudioFileType) => ({
       id: audioFile.id, // ID temporário (AudioFile ID) - será substituído quando completar
       audioFile: {
         id: audioFile.id,

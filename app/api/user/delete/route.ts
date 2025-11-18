@@ -67,7 +67,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Deletar summaries primeiro (relacionadas com transcriptions)
-    const transcriptionIds = userData.transcriptions.map((t) => t.id);
+    type TranscriptionType = typeof userData.transcriptions[0];
+    const transcriptionIds = userData.transcriptions.map((t: TranscriptionType) => t.id);
     if (transcriptionIds.length > 0) {
       await prisma.summary.deleteMany({
         where: {

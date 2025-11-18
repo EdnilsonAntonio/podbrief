@@ -19,7 +19,8 @@ export async function GET(request: NextRequest) {
     });
 
     // Transformar para formato da UI
-    const formattedInvoices = invoices.map((invoice) => ({
+    type InvoiceType = typeof invoices[0];
+    const formattedInvoices = invoices.map((invoice: InvoiceType) => ({
       id: invoice.id,
       date: invoice.createdAt,
       plan: `${invoice.amountCredits} Credits`, // Usar quantidade de créditos como "plano"
