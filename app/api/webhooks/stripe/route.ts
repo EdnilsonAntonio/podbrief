@@ -42,9 +42,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Log do evento recebido
+    console.log(`📥 Webhook event received: ${event.type} (ID: ${event.id})`);
+
     // Processar eventos
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
+      
+      console.log(`💳 Processing checkout.session.completed for session: ${session.id}`);
+      console.log(`📋 Session metadata:`, JSON.stringify(session.metadata, null, 2));
+      console.log(`💰 Payment status: ${session.payment_status}`);
+      console.log(`✅ Payment intent: ${session.payment_intent}`);
 
       // Verificar se já processamos este pagamento
       const existingPurchase = await prisma.creditPurchase.findUnique({
@@ -52,8 +60,8 @@ export async function POST(request: NextRequest) {
       });
 
       if (existingPurchase) {
-        console.log(`Payment ${session.id} already processed`);
-        return NextResponse.json({ received: true });
+        console.log(`⚠️ Payment ${session.id} already processed`);
+        return NextResponse.json({ received: true, message: "Already processed" });
       }
 
       // Extrair metadados
@@ -62,10 +70,16 @@ export async function POST(request: NextRequest) {
       const credits = parseInt(session.metadata?.credits || "0");
       const amountPaid = parseFloat(session.metadata?.amountPaid || "0");
 
+      console.log(`🔍 Extracted metadata - userId: ${userId}, credits: ${credits}, amountPaid: ${amountPaid}`);
+
       if (!userId || !credits) {
-        console.error("Missing metadata in session:", session.id);
+        console.error(`❌ Missing metadata in session ${session.id}:`, {
+          userId,
+          credits,
+          metadata: session.metadata,
+        });
         return NextResponse.json(
-          { error: "Missing required metadata" },
+          { error: "Missing required metadata", metadata: session.metadata },
           { status: 400 }
         );
       }
@@ -98,7 +112,9 @@ export async function POST(request: NextRequest) {
       const currentCredits = user.credits;
       const newCredits = currentCredits + credits;
 
-      await prisma.user.update({
+      console.log(`💳 Updating credits for user ${user.id}: ${currentCredits} → ${newCredits}`);
+
+      const updatedUser = await prisma.user.update({
         where: { id: user.id },
         data: {
           credits: newCredits,
@@ -106,7 +122,7 @@ export async function POST(request: NextRequest) {
       });
 
       console.log(
-        `Added ${credits} credits to user ${user.id}. New balance: ${newCredits}`
+        `✅ Added ${credits} credits to user ${user.id} (${user.email}). New balance: ${updatedUser.credits}`
       );
 
       // Enviar email de confirmação de compra (assíncrono, não bloqueia)
@@ -169,11 +185,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ received: true });
+    console.log(`✅ Webhook processed successfully for event: ${event.type}`);
+    return NextResponse.json({ received: true, eventType: event.type });
   } catch (error: any) {
-    console.error("Webhook error:", error);
+    console.error("❌ Webhook error:", error);
+    console.error("Error stack:", error.stack);
     return NextResponse.json(
-      { error: "Webhook handler failed" },
+      { 
+        error: "Webhook handler failed",
+        message: error.message,
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
