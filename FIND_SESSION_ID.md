@@ -67,12 +67,7 @@ Procure por eventos do tipo `checkout.session.completed` e veja o `id` no objeto
 
 ## Usar o Session ID
 
-Depois de encontrar o Session ID:
-
-1. Acesse: `https://seu-dominio.com/payments/verify`
-2. Cole o Session ID no campo
-3. Clique em "Verify & Process Payment"
-4. Os créditos serão adicionados imediatamente
+Os pagamentos são processados automaticamente quando você retorna do Stripe. Se por algum motivo o pagamento não foi processado, você pode usar o endpoint da API diretamente ou entrar em contato com o suporte.
 
 ## Dica
 

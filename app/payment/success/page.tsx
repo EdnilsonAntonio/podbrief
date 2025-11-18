@@ -111,12 +111,12 @@ function PaymentSuccessContent() {
                   <p className="font-semibold">{message}</p>
                   {credits && (
                     <p className="text-sm">
-                      <strong>Credits added:</strong> {credits}
+                      <strong>Credits added:</strong> {Math.round(credits * 100) / 100}
                     </p>
                   )}
                   {newBalance !== null && (
                     <p className="text-sm">
-                      <strong>Your new balance:</strong> {newBalance} credits
+                      <strong>Your new balance:</strong> {Math.round(newBalance * 100) / 100} credits
                     </p>
                   )}
                 </div>

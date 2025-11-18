@@ -117,5 +117,4 @@ Após configurar:
 2. ✅ Verifique se os créditos foram adicionados automaticamente
 3. ✅ Verifique os logs para confirmar que está funcionando
 
-**Importante**: Os pagamentos anteriores não serão processados automaticamente. Você precisará processá-los manualmente usando `/payments/verify` com o Session ID. Mas os **próximos** pagamentos serão processados automaticamente! 🎉
-
+**Importante**: Os pagamentos são processados automaticamente quando o usuário retorna do Stripe através da página de confirmação (`/payment/success`). Mesmo se o webhook falhar, o pagamento será processado automaticamente! 🎉
