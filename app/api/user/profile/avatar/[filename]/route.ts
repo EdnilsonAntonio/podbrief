@@ -21,13 +21,10 @@ export async function GET(
       return new NextResponse("Forbidden", { status: 403 });
     }
 
-    const filepath = join(
-      process.cwd(),
-      "tmp",
-      "uploads",
-      "avatars",
-      filename
-    );
+    // No Vercel, apenas /tmp é gravável
+    const filepath = process.env.VERCEL
+      ? `/tmp/uploads/avatars/${filename}`
+      : join(process.cwd(), "tmp", "uploads", "avatars", filename);
 
     if (!existsSync(filepath)) {
       return new NextResponse("File not found", { status: 404 });

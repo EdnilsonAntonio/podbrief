@@ -78,7 +78,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Criar diretório temporário se não existir
-    const uploadDir = join(process.cwd(), "tmp", "uploads");
+    // No Vercel, apenas /tmp é gravável
+    const uploadDir = process.env.VERCEL ? "/tmp/uploads" : join(process.cwd(), "tmp", "uploads");
     if (!existsSync(uploadDir)) {
       mkdirSync(uploadDir, { recursive: true });
     }

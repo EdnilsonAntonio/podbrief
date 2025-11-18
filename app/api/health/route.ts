@@ -27,7 +27,8 @@ export async function GET() {
 
     // Verificar espaço em disco (verificar diretório de uploads)
     try {
-      const uploadDir = join(process.cwd(), "tmp", "uploads");
+      // No Vercel, apenas /tmp é gravável
+      const uploadDir = process.env.VERCEL ? "/tmp/uploads" : join(process.cwd(), "tmp", "uploads");
       if (existsSync(uploadDir)) {
         const stats = statSync(uploadDir);
         // Se conseguir ler o diretório, está OK

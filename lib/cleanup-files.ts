@@ -14,11 +14,12 @@ export async function cleanupOldFiles() {
 
   try {
     // Limpar arquivos de áudio antigos
-    const audioUploadDir = join(process.cwd(), "tmp", "uploads");
+    // No Vercel, apenas /tmp é gravável
+    const audioUploadDir = process.env.VERCEL ? "/tmp/uploads" : join(process.cwd(), "tmp", "uploads");
     await cleanupDirectory(audioUploadDir, maxAge, now);
 
     // Limpar avatares antigos (opcional - pode manter por mais tempo)
-    const avatarUploadDir = join(process.cwd(), "tmp", "uploads", "avatars");
+    const avatarUploadDir = process.env.VERCEL ? "/tmp/uploads/avatars" : join(process.cwd(), "tmp", "uploads", "avatars");
     await cleanupDirectory(avatarUploadDir, maxAge * 2, now); // 14 dias para avatares
 
     // Limpar registros órfãos no banco de dados
