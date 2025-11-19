@@ -146,38 +146,32 @@ export async function POST(request: NextRequest) {
     });
     console.log(`✅ [${audioFile.id}] Status updated to processing (immediate update for UI)`);
     
-    // Processar transcrição usando endpoint dedicado para garantir execução
-    // Isso evita problemas de timeout no Vercel e garante que o processamento continue
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
-                    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
-    const processUrl = `${baseUrl}/api/transcriptions/process-blob`;
+    // Processar transcrição diretamente (não usar fetch para evitar problemas de timeout)
+    // No Vercel, processamos diretamente mas não bloqueamos a resposta
+    // Isso garante que o processamento seja iniciado mesmo que a função HTTP termine
+    console.log(`🚀 [${audioFile.id}] Starting transcription processing directly (no fetch)`);
     
-    // Chamar endpoint de processamento de forma assíncrona (não bloqueia a resposta)
-    fetch(processUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        audioFileId: audioFile.id,
-        blobUrl: url,
-        filename: filename,
-      }),
-    }).catch((error) => {
-      console.error(`❌ [${audioFile.id}] Error calling process endpoint:`, error);
-      // Se falhar ao chamar o endpoint, tentar processar diretamente como fallback
-      import("@/lib/transcription/process-blob").then(({ processTranscriptionFromBlob }) => {
-        return processTranscriptionFromBlob(audioFile.id, url, filename);
-      }).catch((processError) => {
-        console.error(`❌ [${audioFile.id}] Error processing transcription from blob:`, processError);
-        // Atualizar status para error se falhar
-        prisma.audioFile.update({
-          where: { id: audioFile.id },
-          data: { status: "error" },
-        }).catch((updateError) => {
-          console.error("Error updating status to error:", updateError);
-        });
+    // Processar de forma assíncrona, mas garantir que a promise seja mantida
+    // O Vercel manterá a função ativa enquanto houver trabalho pendente
+    const processPromise = import("@/lib/transcription/process-blob").then(({ processTranscriptionFromBlob }) => {
+      console.log(`🔄 [${audioFile.id}] Calling processTranscriptionFromBlob...`);
+      return processTranscriptionFromBlob(audioFile.id, url, filename);
+    }).catch((processError) => {
+      console.error(`❌ [${audioFile.id}] Error processing transcription from blob:`, processError);
+      console.error(`❌ [${audioFile.id}] Error stack:`, processError instanceof Error ? processError.stack : 'No stack');
+      // Atualizar status para error se falhar
+      return prisma.audioFile.update({
+        where: { id: audioFile.id },
+        data: { status: "error" },
+      }).catch((updateError) => {
+        console.error(`❌ [${audioFile.id}] Error updating status to error:`, updateError);
       });
+    });
+    
+    // Não aguardar, mas manter a promise para evitar que seja garbage collected
+    // Isso ajuda o Vercel a manter a função ativa
+    processPromise.catch(() => {
+      // Erro já foi tratado acima
     });
 
     return NextResponse.json({
