@@ -35,7 +35,7 @@ export function ContactForm() {
       if (!response.ok) {
         throw new Error(data.error || "Failed to send message");
       }
-
+      
       toast.success("Thank you for your message! We'll get back to you soon.");
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {

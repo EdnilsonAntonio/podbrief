@@ -88,10 +88,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Estimar duração baseada no tamanho do arquivo (estimativa conservadora: ~1MB por minuto)
-    // Usamos Math.ceil para arredondar para cima e garantir que sempre tenha créditos suficientes
-    // A margem de segurança já está implícita no Math.ceil (arredonda para cima)
+    // Usamos Math.round para arredondar para o centésimo mais próximo
+    // A estimativa é conservadora porque assume 1MB por minuto (maioria dos áudios é mais compacta)
     const estimatedMinutes = file.size / (1024 * 1024); // MB
-    const estimatedCredits = Math.max(0.01, Math.ceil(estimatedMinutes * 100) / 100);
+    const estimatedCredits = Math.max(0.01, Math.round(estimatedMinutes * 100) / 100);
     
     // Verificar se tem créditos suficientes para a estimativa
     // Usamos <= para permitir exatamente o valor necessário
@@ -244,12 +244,12 @@ async function processTranscription(
     }
 
     // Calcular créditos
-    // Usar Math.ceil para arredondar para cima e garantir que sempre tenha créditos suficientes
-    // Exemplo: 10.01 minutos = 10.01 créditos (arredondado para cima)
-    // Exemplo: 10.00 minutos = 10.00 créditos
+    // Usar Math.round para arredondar para o centésimo mais próximo
+    // Isso é mais justo: 10.00 minutos = 10.00 créditos, 10.01 minutos = 10.01 créditos
+    // Math.ceil estava sendo muito agressivo (10.005 minutos = 10.01 créditos)
     const creditsToDeduct = Math.max(
       0.01,
-      Math.ceil(durationMinutes * 100) / 100
+      Math.round(durationMinutes * 100) / 100
     );
 
     console.log(

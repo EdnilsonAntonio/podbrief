@@ -78,11 +78,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Estimar créditos necessários (se size fornecido)
-    // Usar Math.ceil para arredondar para cima e garantir que sempre tenha créditos suficientes
-    // A margem de segurança já está implícita no Math.ceil (arredonda para cima)
+    // Usar Math.round para arredondar para o centésimo mais próximo
+    // A estimativa é conservadora porque assume 1MB por minuto (maioria dos áudios é mais compacta)
     if (size) {
       const estimatedMinutes = size / (1024 * 1024); // ~1MB por minuto
-      const estimatedCredits = Math.max(0.01, Math.ceil(estimatedMinutes * 100) / 100);
+      const estimatedCredits = Math.max(0.01, Math.round(estimatedMinutes * 100) / 100);
       
       if (user.credits <= 0 || user.credits < estimatedCredits) {
         return NextResponse.json(

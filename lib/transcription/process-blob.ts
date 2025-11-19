@@ -133,12 +133,12 @@ export async function processTranscriptionFromBlob(
     }
 
     // Calcular créditos
-    // Usar Math.ceil para arredondar para cima e garantir que sempre tenha créditos suficientes
-    // Exemplo: 10.01 minutos = 10.01 créditos (arredondado para cima)
-    // Exemplo: 10.00 minutos = 10.00 créditos
+    // Usar Math.round para arredondar para o centésimo mais próximo
+    // Isso é mais justo: 10.00 minutos = 10.00 créditos, 10.01 minutos = 10.01 créditos
+    // Math.ceil estava sendo muito agressivo (10.005 minutos = 10.01 créditos)
     const creditsToDeduct = Math.max(
       0.01,
-      Math.ceil(durationMinutes * 100) / 100
+      Math.round(durationMinutes * 100) / 100
     );
 
     console.log(
