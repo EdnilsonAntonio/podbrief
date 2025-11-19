@@ -241,7 +241,7 @@ export default async function LandingPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                We support all major audio formats including MP3, WAV, M4A, OGG, and FLAC. The maximum file size is 500MB.
+                We support all major audio formats including MP3, WAV, M4A, OGG, and FLAC. The maximum file size is 300MB.
               </p>
             </CardContent>
           </Card>

@@ -25,8 +25,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: result.success,
-      deletedCount: result.deletedCount,
-      errors: result.errors,
+      deletedFiles: result.deletedFiles || 0,
+      deletedRecords: result.deletedRecords || 0,
+      deletedBlobs: result.deletedBlobs || 0,
+      errors: result.errors || 0,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

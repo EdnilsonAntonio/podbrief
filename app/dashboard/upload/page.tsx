@@ -262,7 +262,7 @@ export default function UploadPage() {
                 <CardHeader>
                     <CardTitle>Select Audio File</CardTitle>
                     <CardDescription>
-                        Supported formats: MP3, WAV, M4A, OGG, FLAC (Max 500MB)
+                        Supported formats: MP3, WAV, M4A, OGG, FLAC (Max 300MB)
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -346,6 +346,16 @@ export default function UploadPage() {
                     )}
                 </CardContent>
             </Card>
+
+            <Alert className="border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950">
+                <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <AlertTitle className="text-blue-900 dark:text-blue-100">
+                    Audio File Retention
+                </AlertTitle>
+                <AlertDescription className="text-blue-800 dark:text-blue-200">
+                    Audio files are automatically deleted after 7 days to save storage space. Your transcriptions and summaries will be permanently saved and remain accessible.
+                </AlertDescription>
+            </Alert>
 
             <Card>
                 <CardHeader>
