@@ -69,16 +69,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Validar tamanho
-    // Vercel tem limite de ~4.5MB para funções serverless
-    // Usamos 4MB como limite seguro para uploads
-    const maxSize = 4 * 1024 * 1024; // 4MB
+    // IMPORTANTE: Vercel tem limite HARD de ~4.5MB para o body de requisições
+    // Arquivos maiores que isso são REJEITADOS pelo Vercel ANTES de chegar ao código
+    // Este código só executa para arquivos que passaram pelo limite do Vercel
+    const maxSize = 4 * 1024 * 1024; // 4MB (limite seguro, abaixo do limite do Vercel)
+    
     if (file.size > maxSize) {
+      // Se chegou aqui, significa que o arquivo passou pelo limite do Vercel
+      // Mas isso não deveria acontecer - o Vercel deveria ter rejeitado antes
+      // De qualquer forma, rejeitamos aqui também
       return NextResponse.json(
         { 
           error: "File too large",
-          message: `File size (${(file.size / (1024 * 1024)).toFixed(2)}MB) exceeds the maximum allowed size of 4MB. Please compress your audio file or split it into smaller parts.`
+          message: `File size (${(file.size / (1024 * 1024)).toFixed(2)}MB) exceeds the maximum allowed size of 4MB. Vercel serverless functions have a hard limit of 4.5MB. Please compress your audio file or split it into smaller parts.`
         },
-        { status: 413 } // 413 Payload Too Large
+        { status: 413 }
       );
     }
 

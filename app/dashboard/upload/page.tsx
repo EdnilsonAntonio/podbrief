@@ -48,10 +48,105 @@ export default function UploadPage() {
         setUploadProgress(0);
 
         try {
+            const fileSizeMB = file.size / (1024 * 1024);
+            const useChunkUpload = file.size > 4 * 1024 * 1024; // > 4MB
+
+            if (useChunkUpload) {
+                // Upload em chunks para arquivos grandes
+                console.log(`📦 Large file detected: ${fileSizeMB.toFixed(2)}MB - Using chunked upload`);
+                
+                const CHUNK_SIZE = 3 * 1024 * 1024; // 3MB por chunk
+                const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+                const uploadId = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+                console.log(`📊 File will be split into ${totalChunks} chunks`);
+
+                try {
+                    // Enviar chunks sequencialmente
+                    for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+                        const start = chunkIndex * CHUNK_SIZE;
+                        const end = Math.min(start + CHUNK_SIZE, file.size);
+                        const chunk = file.slice(start, end);
+
+                        const chunkFormData = new FormData();
+                        chunkFormData.append("chunk", chunk);
+                        chunkFormData.append("uploadId", uploadId);
+                        chunkFormData.append("chunkIndex", chunkIndex.toString());
+                        chunkFormData.append("totalChunks", totalChunks.toString());
+                        chunkFormData.append("filename", file.name);
+                        chunkFormData.append("contentType", file.type);
+                        chunkFormData.append("totalSize", file.size.toString());
+
+                        // Atualizar progresso (reservar 10% para recombinação)
+                        const uploadProgress = Math.floor(((chunkIndex + 1) / totalChunks) * 90);
+                        setUploadProgress(uploadProgress);
+
+                        console.log(`⬆️ Uploading chunk ${chunkIndex + 1}/${totalChunks}...`);
+
+                        const chunkResponse = await fetch("/api/upload/chunk", {
+                            method: "POST",
+                            body: chunkFormData,
+                        });
+
+                        if (!chunkResponse.ok) {
+                            const chunkData = await chunkResponse.json().catch(() => ({}));
+                            throw new Error(chunkData.error || chunkData.message || `Failed to upload chunk ${chunkIndex + 1}/${totalChunks}`);
+                        }
+
+                        const chunkData = await chunkResponse.json();
+                        console.log(`✅ Chunk ${chunkIndex + 1}/${totalChunks} uploaded:`, chunkData.message);
+                    }
+
+                    // Todos os chunks foram enviados, agora recombinar
+                    console.log(`🔄 All chunks uploaded, recombining file...`);
+                    setUploadProgress(95);
+
+                    const completeResponse = await fetch("/api/upload/complete", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            uploadId,
+                            filename: file.name,
+                            contentType: file.type,
+                            totalSize: file.size,
+                            totalChunks,
+                        }),
+                    });
+
+                    if (!completeResponse.ok) {
+                        const completeData = await completeResponse.json().catch(() => ({}));
+                        throw new Error(completeData.error || completeData.message || "Failed to complete upload");
+                    }
+
+                    const completeData = await completeResponse.json();
+                    setUploadProgress(100);
+
+                    toast.success(`File (${fileSizeMB.toFixed(2)}MB) uploaded successfully! Processing transcription...`);
+                    setTimeout(() => {
+                        router.push("/dashboard/transcriptions");
+                    }, 1500);
+                    return;
+                } catch (chunkError: any) {
+                    // Em caso de erro, tentar limpar chunks no servidor
+                    console.error("Chunk upload error:", chunkError);
+                    // Não bloquear se a limpeza falhar
+                    fetch("/api/upload/cleanup", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ uploadId }),
+                    }).catch(() => {});
+                    
+                    throw chunkError;
+                }
+            }
+
+            // Upload direto para arquivos pequenos (< 4MB)
             const formData = new FormData();
             formData.append("file", file);
 
-            // Simular progresso durante upload (para arquivos grandes)
+            // Simular progresso durante upload
             const progressInterval = setInterval(() => {
                 setUploadProgress((prev) => {
                     if (prev >= 90) {
@@ -74,9 +169,9 @@ export default function UploadPage() {
             let data: any = null;
             const contentType = response.headers.get("content-type");
             
-            // Tratar erro 413 (Payload Too Large) antes de tentar parse
+            // Tratar erro 413 (Payload Too Large)
             if (response.status === 413) {
-              const errorMsg = "File size exceeds the 4MB limit. Please compress your audio file or split it into smaller parts.";
+              const errorMsg = data?.message || "File size exceeds the maximum allowed size. Please compress your audio file or split it into smaller parts.";
               setError(errorMsg);
               throw new Error(errorMsg);
             }
