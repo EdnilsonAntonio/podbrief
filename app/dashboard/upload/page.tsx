@@ -71,10 +71,25 @@ export default function UploadPage() {
             setUploadProgress(100);
 
             // Verificar se a resposta é JSON antes de fazer parse
-            let data;
+            let data: any = null;
             const contentType = response.headers.get("content-type");
+            
+            // Tratar erro 413 (Payload Too Large) antes de tentar parse
+            if (response.status === 413) {
+              const errorMsg = "File size exceeds the 4MB limit. Please compress your audio file or split it into smaller parts.";
+              setError(errorMsg);
+              throw new Error(errorMsg);
+            }
+            
             if (contentType && contentType.includes("application/json")) {
-              data = await response.json();
+              try {
+                data = await response.json();
+              } catch (e) {
+                // Se falhar ao fazer parse, ler como texto
+                const text = await response.text();
+                console.error("Failed to parse JSON response:", text);
+                throw new Error(`Server error: ${text.substring(0, 100)}`);
+              }
             } else {
               // Se não for JSON, ler como texto para ver o erro
               const text = await response.text();
@@ -85,21 +100,21 @@ export default function UploadPage() {
             if (!response.ok) {
                 // Tratar diferentes tipos de erro com mensagens específicas
                 if (response.status === 429) {
-                    const resetTime = data.reset ? new Date(data.reset).toLocaleTimeString() : "later";
+                    const resetTime = data?.reset ? new Date(data.reset).toLocaleTimeString() : "later";
                     const errorMsg = `Upload limit exceeded. You can upload up to 10 files per hour. Please try again after ${resetTime}.`;
                     setError(errorMsg);
                     throw new Error(errorMsg);
                 } else if (response.status === 400) {
-                    if (data.error === "Insufficient credits") {
+                    if (data?.error === "Insufficient credits") {
                         // Usar mensagem detalhada do servidor se disponível
                         const errorMsg = data.message || "You don't have enough credits to transcribe this file. Please purchase more credits.";
                         setError(errorMsg);
                         throw new Error(errorMsg);
-                    } else if (data.error?.includes("File too large")) {
-                        const errorMsg = "File size exceeds the 500MB limit. Please compress your audio file or split it into smaller parts.";
+                    } else if (data?.error?.includes("File too large")) {
+                        const errorMsg = data.message || "File size exceeds the 4MB limit. Please compress your audio file or split it into smaller parts.";
                         setError(errorMsg);
                         throw new Error(errorMsg);
-                    } else if (data.error?.includes("Invalid file type")) {
+                    } else if (data?.error?.includes("Invalid file type")) {
                         const errorMsg = "Invalid file type. Please upload an audio file (MP3, WAV, M4A, OGG, or FLAC).";
                         setError(errorMsg);
                         throw new Error(errorMsg);
@@ -109,7 +124,7 @@ export default function UploadPage() {
                     setError(errorMsg);
                     throw new Error(errorMsg);
                 }
-                throw new Error(data.error || data.message || "Upload failed. Please try again.");
+                throw new Error(data?.error || data?.message || "Upload failed. Please try again.");
             }
 
             toast.success("File uploaded successfully! Processing transcription...");

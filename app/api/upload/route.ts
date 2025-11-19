@@ -68,12 +68,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validar tamanho (500MB max)
-    const maxSize = 500 * 1024 * 1024; // 500MB
+    // Validar tamanho
+    // Vercel tem limite de ~4.5MB para funções serverless
+    // Usamos 4MB como limite seguro para uploads
+    const maxSize = 4 * 1024 * 1024; // 4MB
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: "File too large. Maximum size is 500MB." },
-        { status: 400 }
+        { 
+          error: "File too large",
+          message: `File size (${(file.size / (1024 * 1024)).toFixed(2)}MB) exceeds the maximum allowed size of 4MB. Please compress your audio file or split it into smaller parts.`
+        },
+        { status: 413 } // 413 Payload Too Large
       );
     }
 
