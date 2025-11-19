@@ -36,17 +36,6 @@ export async function GET(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Verificar se o arquivo ainda existe no sistema de arquivos
-    if (!existsSync(audioFile.url)) {
-      return NextResponse.json(
-        { error: "Audio file no longer available" },
-        { status: 404 }
-      );
-    }
-
-    // Ler o arquivo
-    const fileBuffer = await readFile(audioFile.url);
-
     // Determinar o tipo MIME baseado na extensão
     const filename = audioFile.originalFilename || "";
     let contentType = "audio/mpeg"; // Default
@@ -56,8 +45,44 @@ export async function GET(
     else if (filename.endsWith(".flac")) contentType = "audio/flac";
     else if (filename.endsWith(".webm")) contentType = "audio/webm";
 
+    // Verificar se é uma URL do Blob (começa com https://) ou caminho local
+    let fileBuffer: Buffer;
+    
+    if (audioFile.url.startsWith("https://")) {
+      // É uma URL do Vercel Blob - fazer fetch
+      console.log(`📥 Fetching audio from Blob: ${audioFile.url}`);
+      try {
+        const response = await fetch(audioFile.url);
+        if (!response.ok) {
+          console.error(`❌ Failed to fetch from Blob: ${response.status} ${response.statusText}`);
+          return NextResponse.json(
+            { error: "Audio file no longer available" },
+            { status: 404 }
+          );
+        }
+        const arrayBuffer = await response.arrayBuffer();
+        fileBuffer = Buffer.from(arrayBuffer);
+        console.log(`✅ Audio fetched from Blob, size: ${(fileBuffer.length / (1024 * 1024)).toFixed(2)}MB`);
+      } catch (fetchError: any) {
+        console.error("Error fetching from Blob:", fetchError);
+        return NextResponse.json(
+          { error: "Failed to fetch audio file" },
+          { status: 500 }
+        );
+      }
+    } else {
+      // É um caminho local - ler do sistema de arquivos
+      if (!existsSync(audioFile.url)) {
+        return NextResponse.json(
+          { error: "Audio file no longer available" },
+          { status: 404 }
+        );
+      }
+      fileBuffer = await readFile(audioFile.url);
+    }
+
     // Retornar o arquivo com headers apropriados
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(new Uint8Array(fileBuffer), {
       headers: {
         "Content-Type": contentType,
         "Content-Length": fileBuffer.length.toString(),
