@@ -88,12 +88,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Estimar duração baseada no tamanho do arquivo (estimativa conservadora: ~1MB por minuto)
-    // Adicionar margem de segurança de 5% para compensar variações na duração real
-    // Isso ajuda a validar créditos antes de aceitar o upload
     // Usamos Math.ceil para arredondar para cima e garantir que sempre tenha créditos suficientes
+    // A margem de segurança já está implícita no Math.ceil (arredonda para cima)
     const estimatedMinutes = file.size / (1024 * 1024); // MB
-    const estimatedCreditsWithMargin = estimatedMinutes * 1.05; // Adicionar 5% de margem
-    const estimatedCredits = Math.max(0.01, Math.ceil(estimatedCreditsWithMargin * 100) / 100);
+    const estimatedCredits = Math.max(0.01, Math.ceil(estimatedMinutes * 100) / 100);
     
     // Verificar se tem créditos suficientes para a estimativa
     // Usamos <= para permitir exatamente o valor necessário

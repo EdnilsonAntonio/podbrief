@@ -78,12 +78,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Estimar créditos necessários (se size fornecido)
-    // Adicionar margem de segurança de 5% para compensar variações na duração real
     // Usar Math.ceil para arredondar para cima e garantir que sempre tenha créditos suficientes
+    // A margem de segurança já está implícita no Math.ceil (arredonda para cima)
     if (size) {
       const estimatedMinutes = size / (1024 * 1024); // ~1MB por minuto
-      const estimatedCreditsWithMargin = estimatedMinutes * 1.05; // Adicionar 5% de margem
-      const estimatedCredits = Math.max(0.01, Math.ceil(estimatedCreditsWithMargin * 100) / 100);
+      const estimatedCredits = Math.max(0.01, Math.ceil(estimatedMinutes * 100) / 100);
       
       if (user.credits <= 0 || user.credits < estimatedCredits) {
         return NextResponse.json(
