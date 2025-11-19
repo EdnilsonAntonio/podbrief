@@ -59,6 +59,8 @@ export default function TranscriptionsPage() {
         refetchOnWindowFocus: true,
         refetchOnMount: true,
         staleTime: 0, // Sempre considerar os dados como stale para forçar refetch
+        // Adicionar cacheTime menor para garantir que dados antigos sejam removidos
+        gcTime: 0, // Não manter em cache (anteriormente cacheTime)
     });
 
     // Monitorar mudanças nas transcrições e forçar refetch quando necessário
@@ -79,10 +81,18 @@ export default function TranscriptionsPage() {
                 return !previousStatus || previousStatus !== t.audioFile.status;
             });
 
-            // Se houve mudança de status ou nova transcrição, forçar refetch
-            if (hasStatusChanged) {
+            // Verificar também se o número de itens mudou (nova transcrição completada)
+            const countChanged = transcriptions.length !== previousTranscriptionsRef.current.length;
+
+            // Se houve mudança de status, nova transcrição ou mudança no número de itens, forçar refetch
+            if (hasStatusChanged || countChanged) {
                 // Forçar refetch imediatamente para pegar a última versão
-                refetch();
+                // Usar setTimeout para evitar múltiplos refetches simultâneos
+                const timeoutId = setTimeout(() => {
+                    refetch();
+                }, 100);
+                
+                return () => clearTimeout(timeoutId);
             }
         }
         previousTranscriptionsRef.current = transcriptions;

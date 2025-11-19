@@ -17,12 +17,22 @@ export async function processTranscriptionFromBlob(
     console.log(`📝 [${audioFileId}] Starting transcription process from Blob`);
     console.log(`📂 [${audioFileId}] Blob URL: ${blobUrl}`);
     
-    // Atualizar status para processing
-    await prisma.audioFile.update({
+    // Verificar se o status já está como "processing" (pode ter sido atualizado no endpoint)
+    // Se não estiver, atualizar para processing
+    const currentAudioFile = await prisma.audioFile.findUnique({
       where: { id: audioFileId },
-      data: { status: "processing" },
+      select: { status: true },
     });
-    console.log(`✅ [${audioFileId}] Status updated to processing`);
+    
+    if (currentAudioFile?.status !== "processing") {
+      await prisma.audioFile.update({
+        where: { id: audioFileId },
+        data: { status: "processing" },
+      });
+      console.log(`✅ [${audioFileId}] Status updated to processing`);
+    } else {
+      console.log(`ℹ️ [${audioFileId}] Status already set to processing`);
+    }
 
     const audioFile = await prisma.audioFile.findUnique({
       where: { id: audioFileId },
@@ -123,17 +133,21 @@ export async function processTranscriptionFromBlob(
     }
 
     // Calcular créditos
+    // Usar Math.ceil para arredondar para cima e garantir que sempre tenha créditos suficientes
+    // Exemplo: 10.01 minutos = 10.01 créditos (arredondado para cima)
+    // Exemplo: 10.00 minutos = 10.00 créditos
     const creditsToDeduct = Math.max(
       0.01,
-      Math.round(durationMinutes * 100) / 100
+      Math.ceil(durationMinutes * 100) / 100
     );
 
     console.log(
-      `💰 [${audioFileId}] Credits to deduct: ${creditsToDeduct}, Current credits: ${audioFile.user.credits}`
+      `💰 [${audioFileId}] Credits to deduct: ${creditsToDeduct}, Current credits: ${audioFile.user.credits}, Duration: ${durationMinutes.toFixed(2)} min`
     );
 
     // Verificar se tem créditos suficientes
-    if (audioFile.user.credits < creditsToDeduct) {
+    // Usar <= para permitir exatamente o valor necessário
+    if (audioFile.user.credits <= 0 || audioFile.user.credits < creditsToDeduct) {
       await prisma.audioFile.update({
         where: { id: audioFileId },
         data: { status: "error" },

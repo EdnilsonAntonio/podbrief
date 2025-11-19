@@ -186,17 +186,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Calcular créditos
+    // Usar Math.ceil para arredondar para cima e garantir que sempre tenha créditos suficientes
     const creditsToDeduct = Math.max(
       0.01,
-      Math.round(durationMinutes * 100) / 100
+      Math.ceil(durationMinutes * 100) / 100
     );
 
     console.log(
-      `💰 Credits to deduct: ${creditsToDeduct}, Current credits: ${audioFile.user.credits}`
+      `💰 Credits to deduct: ${creditsToDeduct}, Current credits: ${audioFile.user.credits}, Duration: ${durationMinutes.toFixed(2)} min`
     );
 
     // Verificar se tem créditos suficientes
-    if (audioFile.user.credits < creditsToDeduct) {
+    // Usar <= para permitir exatamente o valor necessário
+    if (audioFile.user.credits <= 0 || audioFile.user.credits < creditsToDeduct) {
       await prisma.audioFile.update({
         where: { id: audioFileId },
         data: { status: "error" },

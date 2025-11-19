@@ -32,10 +32,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Estimar créditos necessários
+    // Adicionar margem de segurança de 5% para compensar variações na duração real
+    // Usar Math.ceil para arredondar para cima e garantir que sempre tenha créditos suficientes
     const estimatedMinutes = totalSize / (1024 * 1024); // ~1MB por minuto
-    const estimatedCredits = Math.max(0.01, Math.round(estimatedMinutes * 100) / 100);
+    const estimatedCreditsWithMargin = estimatedMinutes * 1.05; // Adicionar 5% de margem
+    const estimatedCredits = Math.max(0.01, Math.ceil(estimatedCreditsWithMargin * 100) / 100);
     
-    if (user.credits < estimatedCredits) {
+    if (user.credits <= 0 || user.credits < estimatedCredits) {
       return NextResponse.json(
         { 
           error: "Insufficient credits",
@@ -129,11 +132,19 @@ export async function POST(request: NextRequest) {
         originalFilename: filename,
         sizeBytes: totalSize,
         durationSeconds: null,
-        status: "pending",
+        status: "pending", // Será atualizado para "processing" imediatamente
       },
     });
 
     console.log(`🚀 Starting transcription processing for audioFile ${audioFile.id} (from chunks)`);
+    
+    // Atualizar status para "processing" imediatamente para que a UI detecte
+    // Isso garante que o polling no dashboard funcione corretamente
+    await prisma.audioFile.update({
+      where: { id: audioFile.id },
+      data: { status: "processing" },
+    });
+    console.log(`✅ [${audioFile.id}] Status updated to processing (immediate update for UI)`);
     
     // Processar transcrição de forma assíncrona mas garantindo execução
     // No Vercel, precisamos garantir que o processamento continue mesmo após a resposta

@@ -88,12 +88,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Estimar duração baseada no tamanho do arquivo (estimativa conservadora: ~1MB por minuto)
+    // Adicionar margem de segurança de 5% para compensar variações na duração real
     // Isso ajuda a validar créditos antes de aceitar o upload
+    // Usamos Math.ceil para arredondar para cima e garantir que sempre tenha créditos suficientes
     const estimatedMinutes = file.size / (1024 * 1024); // MB
-    const estimatedCredits = Math.max(0.01, Math.round(estimatedMinutes * 100) / 100);
+    const estimatedCreditsWithMargin = estimatedMinutes * 1.05; // Adicionar 5% de margem
+    const estimatedCredits = Math.max(0.01, Math.ceil(estimatedCreditsWithMargin * 100) / 100);
     
     // Verificar se tem créditos suficientes para a estimativa
-    if (user.credits < estimatedCredits) {
+    // Usamos <= para permitir exatamente o valor necessário
+    if (user.credits <= 0 || user.credits < estimatedCredits) {
       return NextResponse.json(
         { 
           error: "Insufficient credits",
@@ -242,17 +246,21 @@ async function processTranscription(
     }
 
     // Calcular créditos
+    // Usar Math.ceil para arredondar para cima e garantir que sempre tenha créditos suficientes
+    // Exemplo: 10.01 minutos = 10.01 créditos (arredondado para cima)
+    // Exemplo: 10.00 minutos = 10.00 créditos
     const creditsToDeduct = Math.max(
       0.01,
-      Math.round(durationMinutes * 100) / 100
+      Math.ceil(durationMinutes * 100) / 100
     );
 
     console.log(
-      `💰 [${audioFileId}] Credits to deduct: ${creditsToDeduct}, Current credits: ${audioFile.user.credits}`
+      `💰 [${audioFileId}] Credits to deduct: ${creditsToDeduct}, Current credits: ${audioFile.user.credits}, Duration: ${durationMinutes.toFixed(2)} min`
     );
 
     // Verificar se tem créditos suficientes
-    if (audioFile.user.credits < creditsToDeduct) {
+    // Usar <= para permitir exatamente o valor necessário
+    if (audioFile.user.credits <= 0 || audioFile.user.credits < creditsToDeduct) {
       await prisma.audioFile.update({
         where: { id: audioFileId },
         data: { status: "error" },
