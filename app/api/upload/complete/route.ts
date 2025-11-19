@@ -33,8 +33,9 @@ export async function POST(request: NextRequest) {
 
     // Estimar créditos necessários
     // Usar Math.round para arredondar para o centésimo mais próximo
-    // A estimativa é conservadora porque assume 1MB por minuto (maioria dos áudios é mais compacta)
-    const estimatedMinutes = totalSize / (1024 * 1024); // ~1MB por minuto
+    // Estimativa mais realista: assume ~1.5MB por minuto (MP3 128-192kbps típico de podcasts)
+    // Isso é mais justo porque arquivos maiores geralmente têm melhor qualidade, não necessariamente mais duração
+    const estimatedMinutes = (totalSize / (1024 * 1024)) / 1.5; // Dividir por 1.5 para estimativa mais realista
     const estimatedCredits = Math.max(0.01, Math.round(estimatedMinutes * 100) / 100);
     
     if (user.credits <= 0 || user.credits < estimatedCredits) {
