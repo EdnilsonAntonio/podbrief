@@ -119,6 +119,29 @@ DATABASE_URL=mongodb+srv://... (URL de conexão do MongoDB)
 
 **Nota:** Como está usando MongoDB, não há migrações como no PostgreSQL. O Prisma criará as coleções automaticamente quando necessário.
 
+#### 📦 Armazenamento de Arquivos (Vercel Blob)
+
+```env
+BLOB_READ_WRITE_TOKEN=vercel_blob_... (token do Vercel Blob)
+```
+
+**Como configurar:**
+
+1. Acesse seu projeto no [Vercel Dashboard](https://vercel.com/dashboard)
+2. Vá em **Settings** → **Storage**
+3. Clique em **Create Database** → Selecione **Blob**
+4. Escolha um nome para o Blob Store (ex: `podbrief-blob`)
+5. Após criar, vá em **Settings** → **Storage** → Selecione o Blob Store criado
+6. Vá na aba **Settings** do Blob Store
+7. Copie o **Token** (começa com `vercel_blob_`)
+8. Adicione como variável de ambiente `BLOB_READ_WRITE_TOKEN` no projeto Vercel:
+   - Vá em **Settings** → **Environment Variables**
+   - Adicione `BLOB_READ_WRITE_TOKEN` com o valor do token
+   - Selecione todos os ambientes (Production, Preview, Development)
+   - Clique em **Save**
+
+**Nota:** O Vercel Blob é necessário para uploads de arquivos grandes (>4MB) que são divididos em chunks. Sem este token, uploads grandes falharão.
+
 #### 🌐 URLs da Aplicação
 
 ```env

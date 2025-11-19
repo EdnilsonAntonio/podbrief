@@ -94,10 +94,17 @@ export async function POST(request: NextRequest) {
 
     // Salvar arquivo completo no Vercel Blob
     const uniqueFilename = `audio/${user.id}-${Date.now()}-${filename}`;
+    
+    // Verificar se o token está configurado
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN environment variable is not configured. Please add it to your Vercel project settings.");
+    }
+    
     const { url } = await put(uniqueFilename, completeFile, {
       access: "public",
       contentType,
       addRandomSuffix: false,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
     console.log(`💾 File saved to Blob: ${url}`);
