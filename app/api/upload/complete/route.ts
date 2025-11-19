@@ -135,12 +135,24 @@ export async function POST(request: NextRequest) {
 
     console.log(`🚀 Starting transcription processing for audioFile ${audioFile.id} (from chunks)`);
     
-    // Processar transcrição
-    import("@/lib/transcription/process-blob").then(({ processTranscriptionFromBlob }) => {
-      processTranscriptionFromBlob(audioFile.id, url, filename).catch((error) => {
-        console.error("Error processing transcription from blob:", error);
+    // Processar transcrição de forma assíncrona mas garantindo execução
+    // No Vercel, precisamos garantir que o processamento continue mesmo após a resposta
+    const processPromise = import("@/lib/transcription/process-blob").then(({ processTranscriptionFromBlob }) => {
+      return processTranscriptionFromBlob(audioFile.id, url, filename);
+    }).catch((error) => {
+      console.error(`❌ [${audioFile.id}] Error processing transcription from blob:`, error);
+      // Atualizar status para error se falhar
+      prisma.audioFile.update({
+        where: { id: audioFile.id },
+        data: { status: "error" },
+      }).catch((updateError) => {
+        console.error("Error updating status to error:", updateError);
       });
     });
+    
+    // Não aguardar o processamento, mas garantir que a promise seja mantida
+    // O Vercel manterá a função ativa enquanto houver trabalho pendente
+    processPromise.catch(() => {}); // Evitar unhandled rejection
 
     return NextResponse.json({
       success: true,

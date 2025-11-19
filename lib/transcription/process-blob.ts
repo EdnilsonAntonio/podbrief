@@ -45,13 +45,26 @@ export async function processTranscriptionFromBlob(
     }
 
     // Baixar arquivo do Blob para /tmp para processar
-    console.log(`⬇️ [${audioFileId}] Downloading file from Blob...`);
-    const response = await fetch(blobUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to download file from Blob: ${response.statusText}`);
+    console.log(`⬇️ [${audioFileId}] Downloading file from Blob: ${blobUrl}`);
+    const downloadStartTime = Date.now();
+    
+    let buffer: Buffer;
+    try {
+      const response = await fetch(blobUrl);
+      if (!response.ok) {
+        console.error(`❌ [${audioFileId}] Blob download failed: ${response.status} ${response.statusText}`);
+        throw new Error(`Failed to download file from Blob: ${response.status} ${response.statusText}`);
+      }
+      
+      console.log(`📥 [${audioFileId}] Blob response OK, reading arrayBuffer...`);
+      const arrayBuffer = await response.arrayBuffer();
+      buffer = Buffer.from(arrayBuffer);
+      const downloadTime = ((Date.now() - downloadStartTime) / 1000).toFixed(2);
+      console.log(`✅ [${audioFileId}] File downloaded in ${downloadTime}s, size: ${(buffer.length / (1024 * 1024)).toFixed(2)}MB`);
+    } catch (downloadError: any) {
+      console.error(`❌ [${audioFileId}] Error downloading from Blob:`, downloadError);
+      throw new Error(`Failed to download file from Blob: ${downloadError.message}`);
     }
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
 
     // Salvar temporariamente em /tmp
     const uploadDir = process.env.VERCEL ? "/tmp/uploads" : join(process.cwd(), "tmp", "uploads");
