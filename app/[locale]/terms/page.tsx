@@ -206,14 +206,14 @@ export default async function TermsPage({
             <div>
               <h3 className="font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/pricing" className="hover:text-foreground">Pricing</Link></li>
+                <li><Link href={`/${locale}/pricing`} className="hover:text-foreground">{t("common.pricing")}</Link></li>
                 <li><Link href={`/${locale}/dashboard`} className="hover:text-foreground">{t("common.dashboard")}</Link></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/about" className="hover:text-foreground">About</Link></li>
+                <li><Link href={`/${locale}/about`} className="hover:text-foreground">{t("common.about")}</Link></li>
                 <li><Link href={`/${locale}/contact`} className="hover:text-foreground">{t("common.contact")}</Link></li>
               </ul>
             </div>
