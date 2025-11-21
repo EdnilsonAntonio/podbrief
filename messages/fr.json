@@ -156,6 +156,197 @@
     "email": "E-mail",
     "responseTime": "Délai de réponse",
     "responseTimeValue": "Nous répondons généralement dans les 24-48 heures"
+  },
+  "privacy": {
+    "title": "Politique de Confidentialité",
+    "lastUpdated": "Dernière mise à jour",
+    "contactPage": "page de contact",
+    "introduction": {
+      "title": "1. Introduction",
+      "content": "PodBrief (\"nous\", \"notre\" ou \"nos\") s'engage à protéger votre vie privée. Cette Politique de Confidentialité explique comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous utilisez notre service."
+    },
+    "informationWeCollect": {
+      "title": "2. Informations que Nous Collectons",
+      "personalInfo": {
+        "title": "2.1 Informations Personnelles",
+        "description": "Nous collectons les informations que vous nous fournissez directement, notamment:",
+        "items": [
+          "Nom et adresse e-mail (via le fournisseur d'authentification)",
+          "Informations de profil (nom, photo de profil)",
+          "Informations de paiement (traitées en toute sécurité via Stripe)"
+        ]
+      },
+      "audioFiles": {
+        "title": "2.2 Fichiers Audio",
+        "description": "Lorsque vous téléchargez des fichiers audio pour la transcription:",
+        "items": [
+          "Les fichiers sont stockés temporairement sur nos serveurs",
+          "Les fichiers sont traités à l'aide de l'API Whisper d'OpenAI",
+          "Les fichiers peuvent être supprimés après le traitement ou après une période de rétention"
+        ]
+      },
+      "usageData": {
+        "title": "2.3 Données d'Utilisation",
+        "description": "Nous collectons automatiquement des informations sur la façon dont vous utilisez notre service, notamment:",
+        "items": [
+          "Historique des transcriptions et modèles d'utilisation",
+          "Achats et consommation de crédits",
+          "Informations sur l'appareil et le navigateur"
+        ]
+      }
+    },
+    "howWeUse": {
+      "title": "3. Comment Nous Utilisons Vos Informations",
+      "description": "Nous utilisons les informations que nous collectons pour:",
+      "items": [
+        "Fournir, maintenir et améliorer nos services",
+        "Traiter les transcriptions et générer des résumés",
+        "Traiter les paiements et gérer votre compte",
+        "Vous envoyer des avis techniques et des messages de support",
+        "Répondre à vos commentaires et questions"
+      ]
+    },
+    "dataSharing": {
+      "title": "4. Partage et Divulgation des Données",
+      "description": "Nous ne vendons pas vos informations personnelles. Nous ne pouvons partager vos informations que dans les circonstances suivantes:",
+      "items": [
+        "Fournisseurs de Services: Nous utilisons OpenAI pour traiter les transcriptions. Les fichiers audio sont envoyés aux serveurs d'OpenAI pour traitement.",
+        "Traitement des Paiements: Nous utilisons Stripe pour traiter les paiements. Les informations de paiement sont gérées par Stripe et ne sont pas stockées sur nos serveurs.",
+        "Exigences Légales: Nous pouvons divulguer des informations si la loi l'exige ou pour protéger nos droits."
+      ]
+    },
+    "dataSecurity": {
+      "title": "5. Sécurité des Données",
+      "content": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos informations. Cependant, aucune méthode de transmission sur Internet n'est 100% sécurisée. Bien que nous nous efforcions de protéger vos données, nous ne pouvons garantir une sécurité absolue."
+    },
+    "yourRights": {
+      "title": "6. Vos Droits",
+      "description": "Vous avez le droit de:",
+      "items": [
+        "Accéder et mettre à jour vos informations personnelles via les paramètres de votre compte",
+        "Supprimer votre compte et les données associées",
+        "Demander une copie de vos données",
+        "Vous désabonner de certaines communications"
+      ]
+    },
+    "dataRetention": {
+      "title": "7. Conservation des Données",
+      "content": "Nous conservons vos informations tant que votre compte est actif ou selon les besoins pour fournir des services. Les fichiers audio peuvent être supprimés après le traitement ou après une période de rétention. Vous pouvez supprimer votre compte et les données associées à tout moment."
+    },
+    "childrenPrivacy": {
+      "title": "8. Confidentialité des Enfants",
+      "content": "Notre service n'est pas destiné aux enfants de moins de 13 ans. Nous ne collectons pas sciemment d'informations personnelles auprès d'enfants de moins de 13 ans."
+    },
+    "changesToPolicy": {
+      "title": "9. Modifications de cette Politique",
+      "content": "Nous pouvons mettre à jour cette Politique de Confidentialité de temps à autre. Nous vous informerons de tout changement en publiant la nouvelle Politique de Confidentialité sur cette page et en mettant à jour la date de \"Dernière mise à jour\"."
+    },
+    "contactUs": {
+      "title": "10. Contactez-nous",
+      "content": "Si vous avez des questions sur cette Politique de Confidentialité, veuillez nous contacter à"
+    }
+  },
+  "terms": {
+    "title": "Conditions d'Utilisation",
+    "lastUpdated": "Dernière mise à jour",
+    "contactPage": "page de contact",
+    "acceptance": {
+      "title": "1. Acceptation des Conditions",
+      "content": "En accédant et en utilisant PodBrief (\"le Service\"), vous acceptez et convenez d'être lié par les termes et dispositions de cet accord. Si vous n'acceptez pas ces Conditions d'Utilisation, veuillez ne pas utiliser notre Service."
+    },
+    "description": {
+      "title": "2. Description du Service",
+      "content": "PodBrief fournit des services de transcription et de résumé audio alimentés par l'IA. Nous utilisons les modèles Whisper et GPT d'OpenAI pour transcrire les fichiers audio et générer des résumés, mots-clés et insights."
+    },
+    "userAccounts": {
+      "title": "3. Comptes Utilisateurs",
+      "description": "Pour utiliser notre Service, vous devez créer un compte. Vous êtes responsable de:",
+      "items": [
+        "Maintenir la confidentialité des identifiants de votre compte",
+        "Toutes les activités qui se produisent sous votre compte",
+        "Fournir des informations précises et complètes",
+        "Nous informer immédiatement de toute utilisation non autorisée"
+      ]
+    },
+    "creditsPayments": {
+      "title": "4. Crédits et Paiements",
+      "creditSystem": {
+        "title": "4.1 Système de Crédits",
+        "content": "Notre Service fonctionne sur un système basé sur les crédits. Les crédits sont achetés à l'avance et utilisés pour transcrire les fichiers audio. Un crédit équivaut à une minute de transcription."
+      },
+      "paymentTerms": {
+        "title": "4.2 Conditions de Paiement",
+        "content": "Tous les paiements sont traités en toute sécurité via Stripe. En effectuant un achat, vous acceptez les conditions de service de Stripe. Les prix sont affichés en USD et sont sujets à changement."
+      },
+      "refunds": {
+        "title": "4.3 Remboursements",
+        "content": "Les crédits ne sont pas remboursables mais n'expirent jamais. Vous pouvez utiliser les crédits achetés à tout moment. Si vous rencontrez des problèmes techniques, veuillez contacter le support pour obtenir de l'aide."
+      }
+    },
+    "acceptableUse": {
+      "title": "5. Utilisation Acceptable",
+      "description": "Vous acceptez de ne pas utiliser le Service pour:",
+      "items": [
+        "Télécharger du contenu illégal, nuisible ou violant des lois",
+        "Télécharger du contenu qui enfreint les droits de propriété intellectuelle",
+        "Télécharger du contenu contenant des logiciels malveillants, virus ou code nuisible",
+        "Tenter de faire de l'ingénierie inverse ou compromettre le Service",
+        "Utiliser le Service à des fins commerciales non autorisées"
+      ]
+    },
+    "contentOwnership": {
+      "title": "6. Propriété du Contenu",
+      "content": "Vous conservez tous les droits de propriété sur les fichiers audio que vous téléchargez et les transcriptions générées à partir de ceux-ci. En utilisant notre Service, vous nous accordez une licence limitée pour traiter vos fichiers uniquement dans le but de fournir des services de transcription."
+    },
+    "serviceAvailability": {
+      "title": "7. Disponibilité du Service",
+      "content": "Nous nous efforçons de fournir un service fiable mais ne garantissons pas un fonctionnement ininterrompu ou sans erreur. Le Service peut être indisponible en raison de maintenance, de problèmes techniques ou de circonstances indépendantes de notre volonté."
+    },
+    "accuracyDisclaimer": {
+      "title": "8. Avertissement sur la Précision",
+      "content": "Bien que nous utilisions une technologie IA de pointe, les transcriptions peuvent contenir des erreurs, notamment avec une mauvaise qualité audio, des accents ou une terminologie spécialisée. Nous recommandons de revoir et d'éditer les transcriptions pour la précision."
+    },
+    "limitationLiability": {
+      "title": "9. Limitation de Responsabilité",
+      "content": "Dans la mesure maximale permise par la loi, PodBrief ne sera pas responsable de tout dommage indirect, accessoire, spécial, consécutif ou punitif, ou de toute perte de profits ou de revenus, qu'ils soient encourus directement ou indirectement."
+    },
+    "termination": {
+      "title": "10. Résiliation",
+      "content": "Nous nous réservons le droit de suspendre ou de résilier votre compte à tout moment pour violation de ces Conditions ou pour toute autre raison. Vous pouvez supprimer votre compte à tout moment via les paramètres de votre compte."
+    },
+    "changesToTerms": {
+      "title": "11. Modifications des Conditions",
+      "content": "Nous nous réservons le droit de modifier ces Conditions à tout moment. Nous informerons les utilisateurs des changements importants par e-mail ou via le Service. L'utilisation continue du Service après les changements constitue une acceptation des nouvelles Conditions."
+    },
+    "governingLaw": {
+      "title": "12. Loi Applicable",
+      "content": "Ces Conditions seront régies et interprétées conformément aux lois applicables, sans égard aux dispositions de conflit de lois."
+    },
+    "contactInformation": {
+      "title": "13. Informations de Contact",
+      "content": "Si vous avez des questions sur ces Conditions d'Utilisation, veuillez nous contacter à"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "welcomeBack": "Bon retour! Voici un aperçu de votre compte.",
+    "purchaseCredits": "Acheter des Crédits",
+    "lowCredits": "Crédits Faibles",
+    "lowCreditsDescription": "Il vous reste {credits} crédits.",
+    "purchaseMoreCredits": "Acheter plus de crédits",
+    "toContinue": "pour continuer à transcrire vos fichiers audio.",
+    "totalTranscriptions": "Total des Transcriptions",
+    "completedSuccessfully": "Terminées avec succès",
+    "creditsUsed": "Crédits Utilisés",
+    "allTime": "Tout le temps",
+    "quickActions": "Actions Rapides",
+    "uploadAudio": "Télécharger l'Audio",
+    "recentTranscriptions": "Transcriptions Récentes",
+    "latestAudio": "Vos dernières transcriptions et résumés audio",
+    "viewAll": "Voir Tout",
+    "noTranscriptions": "Aucune transcription pour le moment",
+    "getStarted": "Commencez en téléchargeant votre premier fichier audio",
+    "uploadNow": "Télécharger Maintenant"
   }
 }
 

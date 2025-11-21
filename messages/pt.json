@@ -156,6 +156,197 @@
     "email": "E-mail",
     "responseTime": "Tempo de Resposta",
     "responseTimeValue": "Normalmente respondemos em 24-48 horas"
+  },
+  "privacy": {
+    "title": "Política de Privacidade",
+    "lastUpdated": "Última atualização",
+    "contactPage": "página de contato",
+    "introduction": {
+      "title": "1. Introdução",
+      "content": "O PodBrief (\"nós\", \"nosso\" ou \"nos\") está comprometido em proteger sua privacidade. Esta Política de Privacidade explica como coletamos, usamos, divulgamos e protegemos suas informações quando você usa nosso serviço."
+    },
+    "informationWeCollect": {
+      "title": "2. Informações que Coletamos",
+      "personalInfo": {
+        "title": "2.1 Informações Pessoais",
+        "description": "Coletamos informações que você fornece diretamente a nós, incluindo:",
+        "items": [
+          "Nome e endereço de e-mail (via provedor de autenticação)",
+          "Informações de perfil (nome, foto de perfil)",
+          "Informações de pagamento (processadas com segurança através do Stripe)"
+        ]
+      },
+      "audioFiles": {
+        "title": "2.2 Arquivos de Áudio",
+        "description": "Quando você faz upload de arquivos de áudio para transcrição:",
+        "items": [
+          "Os arquivos são armazenados temporariamente em nossos servidores",
+          "Os arquivos são processados usando a API Whisper da OpenAI",
+          "Os arquivos podem ser excluídos após o processamento ou após um período de retenção"
+        ]
+      },
+      "usageData": {
+        "title": "2.3 Dados de Uso",
+        "description": "Coletamos automaticamente informações sobre como você usa nosso serviço, incluindo:",
+        "items": [
+          "Histórico de transcrições e padrões de uso",
+          "Compras e consumo de créditos",
+          "Informações de dispositivo e navegador"
+        ]
+      }
+    },
+    "howWeUse": {
+      "title": "3. Como Usamos Suas Informações",
+      "description": "Usamos as informações que coletamos para:",
+      "items": [
+        "Fornecer, manter e melhorar nossos serviços",
+        "Processar transcrições e gerar resumos",
+        "Processar pagamentos e gerenciar sua conta",
+        "Enviar avisos técnicos e mensagens de suporte",
+        "Responder aos seus comentários e perguntas"
+      ]
+    },
+    "dataSharing": {
+      "title": "4. Compartilhamento e Divulgação de Dados",
+      "description": "Não vendemos suas informações pessoais. Podemos compartilhar suas informações apenas nas seguintes circunstâncias:",
+      "items": [
+        "Provedores de Serviços: Usamos a OpenAI para processar transcrições. Os arquivos de áudio são enviados para os servidores da OpenAI para processamento.",
+        "Processamento de Pagamentos: Usamos o Stripe para processar pagamentos. As informações de pagamento são tratadas pelo Stripe e não são armazenadas em nossos servidores.",
+        "Requisitos Legais: Podemos divulgar informações se exigido por lei ou para proteger nossos direitos."
+      ]
+    },
+    "dataSecurity": {
+      "title": "5. Segurança de Dados",
+      "content": "Implementamos medidas técnicas e organizacionais apropriadas para proteger suas informações. No entanto, nenhum método de transmissão pela Internet é 100% seguro. Embora nos esforcemos para proteger seus dados, não podemos garantir segurança absoluta."
+    },
+    "yourRights": {
+      "title": "6. Seus Direitos",
+      "description": "Você tem o direito de:",
+      "items": [
+        "Acessar e atualizar suas informações pessoais através das configurações da sua conta",
+        "Excluir sua conta e dados associados",
+        "Solicitar uma cópia dos seus dados",
+        "Optar por não receber certas comunicações"
+      ]
+    },
+    "dataRetention": {
+      "title": "7. Retenção de Dados",
+      "content": "Retemos suas informações enquanto sua conta estiver ativa ou conforme necessário para fornecer serviços. Os arquivos de áudio podem ser excluídos após o processamento ou após um período de retenção. Você pode excluir sua conta e dados associados a qualquer momento."
+    },
+    "childrenPrivacy": {
+      "title": "8. Privacidade de Crianças",
+      "content": "Nosso serviço não é destinado a crianças menores de 13 anos. Não coletamos intencionalmente informações pessoais de crianças menores de 13 anos."
+    },
+    "changesToPolicy": {
+      "title": "9. Alterações nesta Política",
+      "content": "Podemos atualizar esta Política de Privacidade periodicamente. Notificaremos você sobre quaisquer alterações publicando a nova Política de Privacidade nesta página e atualizando a data de \"Última atualização\"."
+    },
+    "contactUs": {
+      "title": "10. Entre em Contato",
+      "content": "Se você tiver alguma dúvida sobre esta Política de Privacidade, entre em contato conosco em"
+    }
+  },
+  "terms": {
+    "title": "Termos de Serviço",
+    "lastUpdated": "Última atualização",
+    "contactPage": "página de contato",
+    "acceptance": {
+      "title": "1. Aceitação dos Termos",
+      "content": "Ao acessar e usar o PodBrief (\"o Serviço\"), você aceita e concorda em estar vinculado aos termos e disposições deste acordo. Se você não concordar com estes Termos de Serviço, por favor, não use nosso Serviço."
+    },
+    "description": {
+      "title": "2. Descrição do Serviço",
+      "content": "O PodBrief fornece serviços de transcrição e resumo de áudio alimentados por IA. Usamos os modelos Whisper e GPT da OpenAI para transcrever arquivos de áudio e gerar resumos, palavras-chave e insights."
+    },
+    "userAccounts": {
+      "title": "3. Contas de Usuário",
+      "description": "Para usar nosso Serviço, você deve criar uma conta. Você é responsável por:",
+      "items": [
+        "Manter a confidencialidade das credenciais da sua conta",
+        "Todas as atividades que ocorrem sob sua conta",
+        "Fornecer informações precisas e completas",
+        "Notificar-nos imediatamente sobre qualquer uso não autorizado"
+      ]
+    },
+    "creditsPayments": {
+      "title": "4. Créditos e Pagamentos",
+      "creditSystem": {
+        "title": "4.1 Sistema de Créditos",
+        "content": "Nosso Serviço opera em um sistema baseado em créditos. Os créditos são comprados antecipadamente e usados para transcrever arquivos de áudio. Um crédito equivale a um minuto de transcrição."
+      },
+      "paymentTerms": {
+        "title": "4.2 Termos de Pagamento",
+        "content": "Todos os pagamentos são processados com segurança através do Stripe. Ao fazer uma compra, você concorda com os termos de serviço do Stripe. Os preços são exibidos em USD e estão sujeitos a alterações."
+      },
+      "refunds": {
+        "title": "4.3 Reembolsos",
+        "content": "Os créditos não são reembolsáveis, mas nunca expiram. Você pode usar os créditos comprados a qualquer momento. Se você tiver problemas técnicos, entre em contato com o suporte para obter assistência."
+      }
+    },
+    "acceptableUse": {
+      "title": "5. Uso Aceitável",
+      "description": "Você concorda em não usar o Serviço para:",
+      "items": [
+        "Fazer upload de conteúdo ilegal, prejudicial ou que viole quaisquer leis",
+        "Fazer upload de conteúdo que infrinja direitos de propriedade intelectual",
+        "Fazer upload de conteúdo contendo malware, vírus ou código prejudicial",
+        "Tentar fazer engenharia reversa ou comprometer o Serviço",
+        "Usar o Serviço para quaisquer fins comerciais não autorizados"
+      ]
+    },
+    "contentOwnership": {
+      "title": "6. Propriedade do Conteúdo",
+      "content": "Você mantém todos os direitos de propriedade dos arquivos de áudio que você faz upload e das transcrições geradas a partir deles. Ao usar nosso Serviço, você nos concede uma licença limitada para processar seus arquivos exclusivamente para o propósito de fornecer serviços de transcrição."
+    },
+    "serviceAvailability": {
+      "title": "7. Disponibilidade do Serviço",
+      "content": "Nos esforçamos para fornecer um serviço confiável, mas não garantimos operação ininterrupta ou livre de erros. O Serviço pode estar indisponível devido a manutenção, problemas técnicos ou circunstâncias além do nosso controle."
+    },
+    "accuracyDisclaimer": {
+      "title": "8. Aviso de Precisão",
+      "content": "Embora usemos tecnologia de IA líder do setor, as transcrições podem conter erros, especialmente com qualidade de áudio ruim, sotaques ou terminologia especializada. Recomendamos revisar e editar as transcrições para precisão."
+    },
+    "limitationLiability": {
+      "title": "9. Limitação de Responsabilidade",
+      "content": "Na máxima extensão permitida por lei, o PodBrief não será responsável por quaisquer danos indiretos, incidentais, especiais, consequenciais ou punitivos, ou qualquer perda de lucros ou receitas, sejam incorridos direta ou indiretamente."
+    },
+    "termination": {
+      "title": "10. Rescisão",
+      "content": "Reservamo-nos o direito de suspender ou encerrar sua conta a qualquer momento por violação destes Termos ou por qualquer outro motivo. Você pode excluir sua conta a qualquer momento através das configurações da sua conta."
+    },
+    "changesToTerms": {
+      "title": "11. Alterações nos Termos",
+      "content": "Reservamo-nos o direito de modificar estes Termos a qualquer momento. Notificaremos os usuários sobre alterações significativas por e-mail ou através do Serviço. O uso continuado do Serviço após as alterações constitui aceitação dos novos Termos."
+    },
+    "governingLaw": {
+      "title": "12. Lei Aplicável",
+      "content": "Estes Termos serão regidos e interpretados de acordo com as leis aplicáveis, sem consideração às disposições de conflito de leis."
+    },
+    "contactInformation": {
+      "title": "13. Informações de Contato",
+      "content": "Se você tiver alguma dúvida sobre estes Termos de Serviço, entre em contato conosco em"
+    }
+  },
+  "dashboard": {
+    "title": "Painel",
+    "welcomeBack": "Bem-vindo de volta! Aqui está uma visão geral da sua conta.",
+    "purchaseCredits": "Comprar Créditos",
+    "lowCredits": "Créditos Baixos",
+    "lowCreditsDescription": "Você tem {credits} créditos restantes.",
+    "purchaseMoreCredits": "Comprar mais créditos",
+    "toContinue": "para continuar transcrevendo seus arquivos de áudio.",
+    "totalTranscriptions": "Total de Transcrições",
+    "completedSuccessfully": "Concluídas com sucesso",
+    "creditsUsed": "Créditos Usados",
+    "allTime": "Todo o tempo",
+    "quickActions": "Ações Rápidas",
+    "uploadAudio": "Enviar Áudio",
+    "recentTranscriptions": "Transcrições Recentes",
+    "latestAudio": "Suas últimas transcrições e resumos de áudio",
+    "viewAll": "Ver Tudo",
+    "noTranscriptions": "Nenhuma transcrição ainda",
+    "getStarted": "Comece fazendo upload do seu primeiro arquivo de áudio",
+    "uploadNow": "Enviar Agora"
   }
 }
 

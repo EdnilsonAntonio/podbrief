@@ -156,6 +156,197 @@
     "email": "E-Mail",
     "responseTime": "Antwortzeit",
     "responseTimeValue": "Wir antworten normalerweise innerhalb von 24-48 Stunden"
+  },
+  "privacy": {
+    "title": "Datenschutzerklärung",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "contactPage": "Kontaktseite",
+    "introduction": {
+      "title": "1. Einleitung",
+      "content": "PodBrief (\"wir\", \"unser\" oder \"uns\") ist verpflichtet, Ihre Privatsphäre zu schützen. Diese Datenschutzerklärung erklärt, wie wir Ihre Informationen sammeln, verwenden, offenlegen und schützen, wenn Sie unseren Service nutzen."
+    },
+    "informationWeCollect": {
+      "title": "2. Informationen, die wir sammeln",
+      "personalInfo": {
+        "title": "2.1 Persönliche Informationen",
+        "description": "Wir sammeln Informationen, die Sie uns direkt zur Verfügung stellen, einschließlich:",
+        "items": [
+          "Name und E-Mail-Adresse (über den Authentifizierungsanbieter)",
+          "Profilinformationen (Name, Profilbild)",
+          "Zahlungsinformationen (sicher über Stripe verarbeitet)"
+        ]
+      },
+      "audioFiles": {
+        "title": "2.2 Audio-Dateien",
+        "description": "Wenn Sie Audio-Dateien zur Transkription hochladen:",
+        "items": [
+          "Dateien werden vorübergehend auf unseren Servern gespeichert",
+          "Dateien werden mit der Whisper-API von OpenAI verarbeitet",
+          "Dateien können nach der Verarbeitung oder nach einer Aufbewahrungsfrist gelöscht werden"
+        ]
+      },
+      "usageData": {
+        "title": "2.3 Nutzungsdaten",
+        "description": "Wir sammeln automatisch Informationen darüber, wie Sie unseren Service nutzen, einschließlich:",
+        "items": [
+          "Transkriptionsverlauf und Nutzungsmuster",
+          "Kreditkäufe und -verbrauch",
+          "Geräte- und Browserinformationen"
+        ]
+      }
+    },
+    "howWeUse": {
+      "title": "3. Wie wir Ihre Informationen verwenden",
+      "description": "Wir verwenden die gesammelten Informationen, um:",
+      "items": [
+        "Unsere Dienste bereitzustellen, zu warten und zu verbessern",
+        "Transkriptionen zu verarbeiten und Zusammenfassungen zu erstellen",
+        "Zahlungen zu verarbeiten und Ihr Konto zu verwalten",
+        "Ihnen technische Hinweise und Support-Nachrichten zu senden",
+        "Auf Ihre Kommentare und Fragen zu antworten"
+      ]
+    },
+    "dataSharing": {
+      "title": "4. Datenweitergabe und Offenlegung",
+      "description": "Wir verkaufen Ihre persönlichen Informationen nicht. Wir können Ihre Informationen nur unter folgenden Umständen teilen:",
+      "items": [
+        "Dienstleister: Wir verwenden OpenAI zur Verarbeitung von Transkriptionen. Audio-Dateien werden zur Verarbeitung an die Server von OpenAI gesendet.",
+        "Zahlungsverarbeitung: Wir verwenden Stripe zur Verarbeitung von Zahlungen. Zahlungsinformationen werden von Stripe behandelt und nicht auf unseren Servern gespeichert.",
+        "Rechtliche Anforderungen: Wir können Informationen offenlegen, wenn dies gesetzlich vorgeschrieben ist oder um unsere Rechte zu schützen."
+      ]
+    },
+    "dataSecurity": {
+      "title": "5. Datensicherheit",
+      "content": "Wir implementieren angemessene technische und organisatorische Maßnahmen zum Schutz Ihrer Informationen. Jedoch ist keine Übertragungsmethode über das Internet zu 100% sicher. Während wir uns bemühen, Ihre Daten zu schützen, können wir keine absolute Sicherheit garantieren."
+    },
+    "yourRights": {
+      "title": "6. Ihre Rechte",
+      "description": "Sie haben das Recht:",
+      "items": [
+        "Auf Ihre persönlichen Informationen über Ihre Kontoeinstellungen zuzugreifen und sie zu aktualisieren",
+        "Ihr Konto und zugehörige Daten zu löschen",
+        "Eine Kopie Ihrer Daten anzufordern",
+        "Sich von bestimmten Kommunikationen abzumelden"
+      ]
+    },
+    "dataRetention": {
+      "title": "7. Datenspeicherung",
+      "content": "Wir behalten Ihre Informationen so lange, wie Ihr Konto aktiv ist oder wie es zur Bereitstellung von Diensten erforderlich ist. Audio-Dateien können nach der Verarbeitung oder nach einer Aufbewahrungsfrist gelöscht werden. Sie können Ihr Konto und zugehörige Daten jederzeit löschen."
+    },
+    "childrenPrivacy": {
+      "title": "Datenschutz für Kinder",
+      "content": "Unser Service ist nicht für Kinder unter 13 Jahren bestimmt. Wir sammeln wissentlich keine persönlichen Informationen von Kindern unter 13 Jahren."
+    },
+    "changesToPolicy": {
+      "title": "9. Änderungen an dieser Richtlinie",
+      "content": "Wir können diese Datenschutzerklärung von Zeit zu Zeit aktualisieren. Wir werden Sie über Änderungen informieren, indem wir die neue Datenschutzerklärung auf dieser Seite veröffentlichen und das Datum \"Zuletzt aktualisiert\" aktualisieren."
+    },
+    "contactUs": {
+      "title": "10. Kontaktieren Sie uns",
+      "content": "Wenn Sie Fragen zu dieser Datenschutzerklärung haben, kontaktieren Sie uns bitte unter"
+    }
+  },
+  "terms": {
+    "title": "Nutzungsbedingungen",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "contactPage": "Kontaktseite",
+    "acceptance": {
+      "title": "1. Annahme der Bedingungen",
+      "content": "Durch den Zugriff auf und die Nutzung von PodBrief (\"der Service\") akzeptieren und stimmen Sie zu, an die Bedingungen und Bestimmungen dieser Vereinbarung gebunden zu sein. Wenn Sie diesen Nutzungsbedingungen nicht zustimmen, verwenden Sie bitte unseren Service nicht."
+    },
+    "description": {
+      "title": "2. Beschreibung des Services",
+      "content": "PodBrief bietet KI-gestützte Audio-Transkriptions- und Zusammenfassungsdienste. Wir verwenden die Whisper- und GPT-Modelle von OpenAI, um Audio-Dateien zu transkribieren und Zusammenfassungen, Schlüsselwörter und Erkenntnisse zu generieren."
+    },
+    "userAccounts": {
+      "title": "3. Benutzerkonten",
+      "description": "Um unseren Service zu nutzen, müssen Sie ein Konto erstellen. Sie sind verantwortlich für:",
+      "items": [
+        "Die Vertraulichkeit Ihrer Kontodaten aufrechterhalten",
+        "Alle Aktivitäten, die unter Ihrem Konto stattfinden",
+        "Genaue und vollständige Informationen bereitstellen",
+        "Uns sofort über jede unbefugte Nutzung benachrichtigen"
+      ]
+    },
+    "creditsPayments": {
+      "title": "4. Gutschriften und Zahlungen",
+      "creditSystem": {
+        "title": "4.1 Gutschriftensystem",
+        "content": "Unser Service arbeitet mit einem gutschriftenbasierten System. Gutschriften werden im Voraus gekauft und zur Transkription von Audio-Dateien verwendet. Eine Gutschrift entspricht einer Minute Transkription."
+      },
+      "paymentTerms": {
+        "title": "4.2 Zahlungsbedingungen",
+        "content": "Alle Zahlungen werden sicher über Stripe verarbeitet. Mit einem Kauf stimmen Sie den Nutzungsbedingungen von Stripe zu. Die Preise werden in USD angezeigt und können sich ändern."
+      },
+      "refunds": {
+        "title": "4.3 Rückerstattungen",
+        "content": "Gutschriften sind nicht erstattungsfähig, laufen aber niemals ab. Sie können gekaufte Gutschriften jederzeit verwenden. Wenn Sie technische Probleme haben, kontaktieren Sie bitte den Support für Hilfe."
+      }
+    },
+    "acceptableUse": {
+      "title": "5. Zulässige Nutzung",
+      "description": "Sie stimmen zu, den Service nicht zu verwenden, um:",
+      "items": [
+        "Inhalte hochzuladen, die illegal, schädlich sind oder Gesetze verletzen",
+        "Inhalte hochzuladen, die geistige Eigentumsrechte verletzen",
+        "Inhalte mit Malware, Viren oder schädlichem Code hochzuladen",
+        "Versuchen, den Service zu reverse-engineern oder zu kompromittieren",
+        "Den Service für nicht autorisierte kommerzielle Zwecke zu verwenden"
+      ]
+    },
+    "contentOwnership": {
+      "title": "6. Eigentum an Inhalten",
+      "content": "Sie behalten alle Eigentumsrechte an den von Ihnen hochgeladenen Audio-Dateien und den daraus generierten Transkriptionen. Durch die Nutzung unseres Services gewähren Sie uns eine begrenzte Lizenz zur Verarbeitung Ihrer Dateien ausschließlich zum Zweck der Bereitstellung von Transkriptionsdiensten."
+    },
+    "serviceAvailability": {
+      "title": "7. Serviceverfügbarkeit",
+      "content": "Wir bemühen uns, einen zuverlässigen Service bereitzustellen, garantieren aber keinen unterbrechungsfreien oder fehlerfreien Betrieb. Der Service kann aufgrund von Wartung, technischen Problemen oder Umständen außerhalb unserer Kontrolle nicht verfügbar sein."
+    },
+    "accuracyDisclaimer": {
+      "title": "8. Genauigkeitshinweis",
+      "content": "Während wir branchenführende KI-Technologie verwenden, können Transkriptionen Fehler enthalten, insbesondere bei schlechter Audioqualität, Akzenten oder spezialisierter Terminologie. Wir empfehlen, Transkriptionen auf Genauigkeit zu überprüfen und zu bearbeiten."
+    },
+    "limitationLiability": {
+      "title": "9. Haftungsbeschränkung",
+      "content": "Im maximal zulässigen Umfang des Gesetzes haftet PodBrief nicht für indirekte, zufällige, besondere, Folgeschäden oder Strafschäden oder für Verluste von Gewinnen oder Einnahmen, ob direkt oder indirekt entstanden."
+    },
+    "termination": {
+      "title": "10. Kündigung",
+      "content": "Wir behalten uns das Recht vor, Ihr Konto jederzeit wegen Verstoßes gegen diese Bedingungen oder aus anderen Gründen zu sperren oder zu kündigen. Sie können Ihr Konto jederzeit über Ihre Kontoeinstellungen löschen."
+    },
+    "changesToTerms": {
+      "title": "11. Änderungen der Bedingungen",
+      "content": "Wir behalten uns das Recht vor, diese Bedingungen jederzeit zu ändern. Wir werden Benutzer über wesentliche Änderungen per E-Mail oder über den Service informieren. Die fortgesetzte Nutzung des Services nach Änderungen stellt eine Annahme der neuen Bedingungen dar."
+    },
+    "governingLaw": {
+      "title": "12. Geltendes Recht",
+      "content": "Diese Bedingungen unterliegen den geltenden Gesetzen und werden in Übereinstimmung damit ausgelegt, ohne Rücksicht auf Kollisionsnormen."
+    },
+    "contactInformation": {
+      "title": "13. Kontaktinformationen",
+      "content": "Wenn Sie Fragen zu diesen Nutzungsbedingungen haben, kontaktieren Sie uns bitte unter"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcomeBack": "Willkommen zurück! Hier ist eine Übersicht über Ihr Konto.",
+    "purchaseCredits": "Gutschriften Kaufen",
+    "lowCredits": "Wenig Gutschriften",
+    "lowCreditsDescription": "Sie haben noch {credits} Gutschriften.",
+    "purchaseMoreCredits": "Mehr Gutschriften kaufen",
+    "toContinue": "um mit der Transkription Ihrer Audio-Dateien fortzufahren.",
+    "totalTranscriptions": "Gesamte Transkriptionen",
+    "completedSuccessfully": "Erfolgreich abgeschlossen",
+    "creditsUsed": "Verwendete Gutschriften",
+    "allTime": "Gesamte Zeit",
+    "quickActions": "Schnellaktionen",
+    "uploadAudio": "Audio Hochladen",
+    "recentTranscriptions": "Aktuelle Transkriptionen",
+    "latestAudio": "Ihre neuesten Audio-Transkriptionen und Zusammenfassungen",
+    "viewAll": "Alle Anzeigen",
+    "noTranscriptions": "Noch keine Transkriptionen",
+    "getStarted": "Beginnen Sie mit dem Hochladen Ihrer ersten Audio-Datei",
+    "uploadNow": "Jetzt Hochladen"
   }
 }
 

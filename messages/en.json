@@ -156,6 +156,197 @@
     "email": "Email",
     "responseTime": "Response Time",
     "responseTimeValue": "We typically respond within 24-48 hours"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated",
+    "contactPage": "contact page",
+    "introduction": {
+      "title": "1. Introduction",
+      "content": "PodBrief (\"we,\" \"our,\" or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our service."
+    },
+    "informationWeCollect": {
+      "title": "2. Information We Collect",
+      "personalInfo": {
+        "title": "2.1 Personal Information",
+        "description": "We collect information that you provide directly to us, including:",
+        "items": [
+          "Name and email address (via authentication provider)",
+          "Profile information (name, profile picture)",
+          "Payment information (processed securely through Stripe)"
+        ]
+      },
+      "audioFiles": {
+        "title": "2.2 Audio Files",
+        "description": "When you upload audio files for transcription:",
+        "items": [
+          "Files are stored temporarily on our servers",
+          "Files are processed using OpenAI's Whisper API",
+          "Files may be deleted after processing or after a retention period"
+        ]
+      },
+      "usageData": {
+        "title": "2.3 Usage Data",
+        "description": "We automatically collect information about how you use our service, including:",
+        "items": [
+          "Transcription history and usage patterns",
+          "Credit purchases and consumption",
+          "Device and browser information"
+        ]
+      }
+    },
+    "howWeUse": {
+      "title": "3. How We Use Your Information",
+      "description": "We use the information we collect to:",
+      "items": [
+        "Provide, maintain, and improve our services",
+        "Process transcriptions and generate summaries",
+        "Process payments and manage your account",
+        "Send you technical notices and support messages",
+        "Respond to your comments and questions"
+      ]
+    },
+    "dataSharing": {
+      "title": "4. Data Sharing and Disclosure",
+      "description": "We do not sell your personal information. We may share your information only in the following circumstances:",
+      "items": [
+        "Service Providers: We use OpenAI to process transcriptions. Audio files are sent to OpenAI's servers for processing.",
+        "Payment Processing: We use Stripe to process payments. Payment information is handled by Stripe and not stored on our servers.",
+        "Legal Requirements: We may disclose information if required by law or to protect our rights."
+      ]
+    },
+    "dataSecurity": {
+      "title": "5. Data Security",
+      "content": "We implement appropriate technical and organizational measures to protect your information. However, no method of transmission over the Internet is 100% secure. While we strive to protect your data, we cannot guarantee absolute security."
+    },
+    "yourRights": {
+      "title": "6. Your Rights",
+      "description": "You have the right to:",
+      "items": [
+        "Access and update your personal information through your account settings",
+        "Delete your account and associated data",
+        "Request a copy of your data",
+        "Opt out of certain communications"
+      ]
+    },
+    "dataRetention": {
+      "title": "7. Data Retention",
+      "content": "We retain your information for as long as your account is active or as needed to provide services. Audio files may be deleted after processing or after a retention period. You can delete your account and associated data at any time."
+    },
+    "childrenPrivacy": {
+      "title": "8. Children's Privacy",
+      "content": "Our service is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13."
+    },
+    "changesToPolicy": {
+      "title": "9. Changes to This Policy",
+      "content": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the \"Last updated\" date."
+    },
+    "contactUs": {
+      "title": "10. Contact Us",
+      "content": "If you have any questions about this Privacy Policy, please contact us at"
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated",
+    "contactPage": "contact page",
+    "acceptance": {
+      "title": "1. Acceptance of Terms",
+      "content": "By accessing and using PodBrief (\"the Service\"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these Terms of Service, please do not use our Service."
+    },
+    "description": {
+      "title": "2. Description of Service",
+      "content": "PodBrief provides AI-powered audio transcription and summarization services. We use OpenAI's Whisper and GPT models to transcribe audio files and generate summaries, keywords, and insights."
+    },
+    "userAccounts": {
+      "title": "3. User Accounts",
+      "description": "To use our Service, you must create an account. You are responsible for:",
+      "items": [
+        "Maintaining the confidentiality of your account credentials",
+        "All activities that occur under your account",
+        "Providing accurate and complete information",
+        "Notifying us immediately of any unauthorized use"
+      ]
+    },
+    "creditsPayments": {
+      "title": "4. Credits and Payments",
+      "creditSystem": {
+        "title": "4.1 Credit System",
+        "content": "Our Service operates on a credit-based system. Credits are purchased in advance and used to transcribe audio files. One credit equals one minute of transcription."
+      },
+      "paymentTerms": {
+        "title": "4.2 Payment Terms",
+        "content": "All payments are processed securely through Stripe. By making a purchase, you agree to Stripe's terms of service. Prices are displayed in USD and are subject to change."
+      },
+      "refunds": {
+        "title": "4.3 Refunds",
+        "content": "Credits are non-refundable but never expire. You can use purchased credits at any time. If you experience technical issues, please contact support for assistance."
+      }
+    },
+    "acceptableUse": {
+      "title": "5. Acceptable Use",
+      "description": "You agree not to use the Service to:",
+      "items": [
+        "Upload content that is illegal, harmful, or violates any laws",
+        "Upload content that infringes on intellectual property rights",
+        "Upload content containing malware, viruses, or harmful code",
+        "Attempt to reverse engineer or compromise the Service",
+        "Use the Service for any unauthorized commercial purposes"
+      ]
+    },
+    "contentOwnership": {
+      "title": "6. Content Ownership",
+      "content": "You retain all ownership rights to the audio files you upload and the transcriptions generated from them. By using our Service, you grant us a limited license to process your files solely for the purpose of providing transcription services."
+    },
+    "serviceAvailability": {
+      "title": "7. Service Availability",
+      "content": "We strive to provide reliable service but do not guarantee uninterrupted or error-free operation. The Service may be unavailable due to maintenance, technical issues, or circumstances beyond our control."
+    },
+    "accuracyDisclaimer": {
+      "title": "8. Accuracy Disclaimer",
+      "content": "While we use industry-leading AI technology, transcriptions may contain errors, especially with poor audio quality, accents, or specialized terminology. We recommend reviewing and editing transcriptions for accuracy."
+    },
+    "limitationLiability": {
+      "title": "9. Limitation of Liability",
+      "content": "To the maximum extent permitted by law, PodBrief shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly."
+    },
+    "termination": {
+      "title": "10. Termination",
+      "content": "We reserve the right to suspend or terminate your account at any time for violation of these Terms or for any other reason. You may delete your account at any time through your account settings."
+    },
+    "changesToTerms": {
+      "title": "11. Changes to Terms",
+      "content": "We reserve the right to modify these Terms at any time. We will notify users of significant changes via email or through the Service. Continued use of the Service after changes constitutes acceptance of the new Terms."
+    },
+    "governingLaw": {
+      "title": "12. Governing Law",
+      "content": "These Terms shall be governed by and construed in accordance with applicable laws, without regard to conflict of law provisions."
+    },
+    "contactInformation": {
+      "title": "13. Contact Information",
+      "content": "If you have any questions about these Terms of Service, please contact us at"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcomeBack": "Welcome back! Here's an overview of your account.",
+    "purchaseCredits": "Purchase Credits",
+    "lowCredits": "Low Credits",
+    "lowCreditsDescription": "You have {credits} credits remaining.",
+    "purchaseMoreCredits": "Purchase more credits",
+    "toContinue": "to continue transcribing your audio files.",
+    "totalTranscriptions": "Total Transcriptions",
+    "completedSuccessfully": "Completed successfully",
+    "creditsUsed": "Credits Used",
+    "allTime": "All time",
+    "quickActions": "Quick Actions",
+    "uploadAudio": "Upload Audio",
+    "recentTranscriptions": "Recent Transcriptions",
+    "latestAudio": "Your latest audio transcriptions and summaries",
+    "viewAll": "View All",
+    "noTranscriptions": "No transcriptions yet",
+    "getStarted": "Get started by uploading your first audio file",
+    "uploadNow": "Upload Now"
   }
 }
 

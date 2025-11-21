@@ -1,5 +1,5 @@
 "use client";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { CreditCard } from "@/components/dashboard/CreditCard";
 import { TranscriptionCard } from "@/components/dashboard/TranscriptionCard";
@@ -51,6 +51,7 @@ async function fetchTranscriptions(): Promise<Transcription[]> {
 
 function DashboardContent() {
     const locale = useLocale();
+    const t = useTranslations();
     const { data: user, isLoading: isLoadingUser, refetch: refetchUser } = useQuery({
         queryKey: ["user"],
         queryFn: fetchUser,
@@ -171,15 +172,15 @@ function DashboardContent() {
         <div className="space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">{t("dashboard.title")}</h1>
                     <p className="text-muted-foreground">
-                        Welcome back! Here's an overview of your account.
+                        {t("dashboard.welcomeBack")}
                     </p>
                 </div>
                 <Button asChild className="w-full sm:w-auto">
                     <Link href={`/${locale}/pricing`}>
                         <ShoppingCart className="mr-2 h-4 w-4" />
-                        Purchase Credits
+                        {t("dashboard.purchaseCredits")}
                     </Link>
                 </Button>
             </div>
@@ -189,14 +190,14 @@ function DashboardContent() {
                 <Alert className="border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950">
                     <Zap className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                     <AlertTitle className="text-orange-900 dark:text-orange-100">
-                        Low Credits
+                        {t("dashboard.lowCredits")}
                     </AlertTitle>
                     <AlertDescription className="text-orange-800 dark:text-orange-200">
-                        You have {user.credits % 1 === 0 ? user.credits.toFixed(0) : user.credits.toFixed(2)} credits remaining.{" "}
+                        {t("dashboard.lowCreditsDescription", { credits: user.credits % 1 === 0 ? user.credits.toFixed(0) : user.credits.toFixed(2) })}{" "}
                         <Link href={`/${locale}/pricing`} className="font-semibold underline hover:no-underline">
-                            Purchase more credits
+                            {t("dashboard.purchaseMoreCredits")}
                         </Link>{" "}
-                        to continue transcribing your audio files.
+                        {t("dashboard.toContinue")}
                     </AlertDescription>
                 </Alert>
             )}
@@ -206,19 +207,19 @@ function DashboardContent() {
                 <CreditCard credits={user?.credits || 0} plan={undefined} />
                 <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Transcriptions</CardTitle>
+                        <CardTitle className="text-sm font-medium">{t("dashboard.totalTranscriptions")}</CardTitle>
                         <div className="rounded-lg bg-primary/10 p-2 group-hover:bg-primary/20 transition-colors">
                             <FileAudio className="h-4 w-4 text-primary" />
                         </div>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{totalTranscriptions}</div>
-                        <p className="text-xs text-muted-foreground">Completed successfully</p>
+                        <p className="text-xs text-muted-foreground">{t("dashboard.completedSuccessfully")}</p>
                     </CardContent>
                 </Card>
                 <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-primary/20">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Credits Used</CardTitle>
+                        <CardTitle className="text-sm font-medium">{t("dashboard.creditsUsed")}</CardTitle>
                         <div className="rounded-lg bg-primary/10 p-2 group-hover:bg-primary/20 transition-colors">
                             <TrendingUp className="h-4 w-4 text-primary" />
                         </div>
@@ -229,12 +230,12 @@ function DashboardContent() {
                                 ? totalCreditsUsed.toFixed(0)
                                 : totalCreditsUsed.toFixed(2)}
                         </div>
-                        <p className="text-xs text-muted-foreground">All time</p>
+                        <p className="text-xs text-muted-foreground">{t("dashboard.allTime")}</p>
                     </CardContent>
                 </Card>
                 <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-primary/20">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Quick Actions</CardTitle>
+                        <CardTitle className="text-sm font-medium">{t("dashboard.quickActions")}</CardTitle>
                         <div className="rounded-lg bg-primary/10 p-2 group-hover:bg-primary/20 transition-colors">
                             <Upload className="h-4 w-4 text-primary" />
                         </div>
@@ -243,7 +244,7 @@ function DashboardContent() {
                         <Button asChild className="w-full shadow-sm hover:shadow-md transition-shadow">
                             <Link href={`/${locale}/dashboard/upload`}>
                                 <Upload className="mr-2 h-4 w-4" />
-                                Upload Audio
+                                {t("dashboard.uploadAudio")}
                             </Link>
                         </Button>
                     </CardContent>
@@ -254,13 +255,13 @@ function DashboardContent() {
             <div>
                 <div className="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">Recent Transcriptions</h2>
+                        <h2 className="text-2xl font-bold tracking-tight">{t("dashboard.recentTranscriptions")}</h2>
                         <p className="text-muted-foreground">
-                            Your latest audio transcriptions and summaries
+                            {t("dashboard.latestAudio")}
                         </p>
                     </div>
                     <Button asChild variant="outline" className="w-full sm:w-auto">
-                        <Link href={`/${locale}/dashboard/transcriptions`}>View All</Link>
+                        <Link href={`/${locale}/dashboard/transcriptions`}>{t("dashboard.viewAll")}</Link>
                     </Button>
                 </div>
                     {recentTranscriptions.length > 0 ? (
