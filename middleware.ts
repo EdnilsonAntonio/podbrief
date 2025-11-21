@@ -1,53 +1,84 @@
+import createMiddleware from "next-intl/middleware";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { locales, defaultLocale } from "./i18n";
+
+// Create next-intl middleware
+const intlMiddleware = createMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: "always", // Always show locale in URL
+});
 
 export async function middleware(request: NextRequest) {
+  // Handle i18n first
+  const response = intlMiddleware(request);
+  
   try {
+    // Extract locale from pathname
+    const pathname = request.nextUrl.pathname;
+    const locale = locales.find(
+      (loc) => pathname.startsWith(`/${loc}/`) || pathname === `/${loc}`
+    ) || defaultLocale;
+
+    // Remove locale from pathname for route checking
+    const pathWithoutLocale = pathname.replace(`/${locale}`, "") || "/";
+    
+    // Skip auth check for API routes (except auth routes)
+    if (pathWithoutLocale.startsWith("/api/") && !pathWithoutLocale.startsWith("/api/auth/")) {
+      return response;
+    }
+
+    // Check authentication for protected routes
     const { isAuthenticated } = getKindeServerSession();
     const authenticated = await isAuthenticated();
 
-    // Rotas protegidas que requerem autenticação
+    // Protected routes that require authentication
     const protectedRoutes = ["/dashboard", "/settings", "/transcription"];
     
-    // Verificar se a rota atual é protegida
     const isProtectedRoute = protectedRoutes.some((route) =>
-      request.nextUrl.pathname.startsWith(route)
+      pathWithoutLocale.startsWith(route)
     );
 
-    // Se for rota protegida e não estiver autenticado, redirecionar para login
+    // If protected route and not authenticated, redirect to login
     if (isProtectedRoute && !authenticated) {
-      const loginUrl = new URL("/api/auth/login", request.url);
+      const loginUrl = new URL(`/${locale}/api/auth/login`, request.url);
       loginUrl.searchParams.set(
         "post_login_redirect_url",
-        request.nextUrl.pathname
+        pathname
       );
       return NextResponse.redirect(loginUrl);
     }
 
-    return NextResponse.next();
+    return response;
   } catch (error) {
-    // Se houver erro no middleware (ex: problema com Kinde), logar e permitir continuar
-    // Isso evita que erros no middleware quebrem toda a aplicação
+    // If error in middleware, log and allow continuation
     console.error("Middleware error:", error);
     
-    // Para rotas protegidas, em caso de erro, redirecionar para login por segurança
+    // For protected routes, redirect to login on error for security
+    const pathname = request.nextUrl.pathname;
+    const locale = locales.find(
+      (loc) => pathname.startsWith(`/${loc}/`) || pathname === `/${loc}`
+    ) || defaultLocale;
+    
+    const pathWithoutLocale = pathname.replace(`/${locale}`, "") || "/";
     const protectedRoutes = ["/dashboard", "/settings", "/transcription"];
     const isProtectedRoute = protectedRoutes.some((route) =>
-      request.nextUrl.pathname.startsWith(route)
+      pathWithoutLocale.startsWith(route)
     );
     
     if (isProtectedRoute) {
-      const loginUrl = new URL("/api/auth/login", request.url);
+      const loginUrl = new URL(`/${locale}/api/auth/login`, request.url);
       loginUrl.searchParams.set(
         "post_login_redirect_url",
-        request.nextUrl.pathname
+        pathname
       );
       return NextResponse.redirect(loginUrl);
     }
     
-    // Para outras rotas, permitir continuar mesmo com erro
-    return NextResponse.next();
+    // For other routes, allow continuation even with error
+    return response;
   }
 }
 
@@ -55,7 +86,7 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
+     * - api (API routes) - but we need to handle /api/auth
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
@@ -64,4 +95,3 @@ export const config = {
     "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
-
