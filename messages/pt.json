@@ -129,6 +129,33 @@
     "creditsAdded": "Créditos adicionados:",
     "newBalance": "Seu novo saldo:",
     "credits": "créditos"
+  },
+  "about": {
+    "title": "Sobre PodBrief",
+    "description": "Estamos em uma missão para tornar a transcrição e análise de áudio acessíveis a todos.",
+    "missionTitle": "Nossa Missão",
+    "missionDescription": "Capacitar criadores de conteúdo, pesquisadores e profissionais com tecnologia de IA de ponta que transforma conteúdo de áudio em insights acionáveis. Acreditamos que cada voz merece ser ouvida e compreendida.",
+    "valuesTitle": "Nossos Valores",
+    "valuesDescription": "Estamos comprometidos com precisão, privacidade e experiência do usuário. Seu conteúdo é seu, e estamos aqui para ajudá-lo a desbloquear seu potencial mantendo seus dados seguros e privados.",
+    "whyChooseTitle": "Por Que Escolher PodBrief?",
+    "whyChooseDescription": "Recursos poderosos projetados para criadores de conteúdo modernos",
+    "aiPoweredTitle": "Alimentado por IA",
+    "aiPoweredDescription": "Aproveitando os modelos Whisper e GPT da OpenAI para as transcrições mais precisas e resumos inteligentes disponíveis.",
+    "fastTitle": "Rápido e Eficiente",
+    "fastDescription": "Obtenha suas transcrições e resumos em minutos, não horas. Processe vários arquivos rapidamente e com eficiência.",
+    "secureTitle": "Seguro e Privado",
+    "secureDescription": "Seus dados são criptografados e seguros. Excluímos automaticamente arquivos de áudio após 7 dias para proteger sua privacidade.",
+    "footerDescription": "Transcrição e resumo alimentados por IA para seus podcasts."
+  },
+  "contact": {
+    "title": "Entre em Contato",
+    "description": "Tem uma pergunta ou precisa de ajuda? Estamos aqui para ajudá-lo.",
+    "sendMessage": "Envie-nos uma Mensagem",
+    "formDescription": "Preencha o formulário abaixo e entraremos em contato o mais rápido possível.",
+    "contactInfo": "Informações de Contato",
+    "email": "E-mail",
+    "responseTime": "Tempo de Resposta",
+    "responseTimeValue": "Normalmente respondemos em 24-48 horas"
   }
 }
 

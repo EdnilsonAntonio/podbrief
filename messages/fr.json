@@ -129,6 +129,33 @@
     "creditsAdded": "Crédits ajoutés:",
     "newBalance": "Votre nouveau solde:",
     "credits": "crédits"
+  },
+  "about": {
+    "title": "À propos de PodBrief",
+    "description": "Nous avons pour mission de rendre la transcription et l'analyse audio accessibles à tous.",
+    "missionTitle": "Notre Mission",
+    "missionDescription": "Donner aux créateurs de contenu, aux chercheurs et aux professionnels les moyens d'utiliser une technologie IA de pointe qui transforme le contenu audio en insights exploitables. Nous croyons que chaque voix mérite d'être entendue et comprise.",
+    "valuesTitle": "Nos Valeurs",
+    "valuesDescription": "Nous nous engageons à garantir la précision, la confidentialité et l'expérience utilisateur. Votre contenu vous appartient, et nous sommes là pour vous aider à libérer son potentiel tout en gardant vos données sécurisées et privées.",
+    "whyChooseTitle": "Pourquoi choisir PodBrief?",
+    "whyChooseDescription": "Des fonctionnalités puissantes conçues pour les créateurs de contenu modernes",
+    "aiPoweredTitle": "Alimenté par l'IA",
+    "aiPoweredDescription": "Exploitant les modèles Whisper et GPT d'OpenAI pour les transcriptions les plus précises et les résumés intelligents disponibles.",
+    "fastTitle": "Rapide et Efficace",
+    "fastDescription": "Obtenez vos transcriptions et résumés en quelques minutes, pas en heures. Traitez plusieurs fichiers rapidement et efficacement.",
+    "secureTitle": "Sécurisé et Privé",
+    "secureDescription": "Vos données sont cryptées et sécurisées. Nous supprimons automatiquement les fichiers audio après 7 jours pour protéger votre vie privée.",
+    "footerDescription": "Transcription et résumé alimentés par l'IA pour vos podcasts."
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "description": "Vous avez une question ou besoin d'aide? Nous sommes là pour vous aider.",
+    "sendMessage": "Envoyez-nous un message",
+    "formDescription": "Remplissez le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais.",
+    "contactInfo": "Informations de contact",
+    "email": "E-mail",
+    "responseTime": "Délai de réponse",
+    "responseTimeValue": "Nous répondons généralement dans les 24-48 heures"
   }
 }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -33,6 +34,7 @@ async function fetchUserProfile(): Promise<UserProfile> {
 }
 
 export function DashboardHeader() {
+    const locale = useLocale();
     const { user: kindeUser } = useKindeBrowserClient();
     const { data: userProfile } = useQuery({
         queryKey: ["user-profile"],
@@ -52,7 +54,7 @@ export function DashboardHeader() {
             <div className="container flex h-16 items-center justify-between px-4">
                 <div className="flex items-center gap-2">
                     <MobileMenuButton />
-                    <Link href="/dashboard" className="flex items-center gap-2" aria-label="PodBrief Home">
+                    <Link href={`/${locale}/dashboard`} className="flex items-center gap-2" aria-label="PodBrief Home">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground" aria-hidden="true">
                             <span className="text-lg font-bold">PB</span>
                         </div>
@@ -85,13 +87,13 @@ export function DashboardHeader() {
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
-                                <Link href="/settings" className="flex items-center">
+                                <Link href={`/${locale}/settings`} className="flex items-center">
                                     <User className="mr-2 h-4 w-4" />
                                     <span>Profile</span>
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href="/settings" className="flex items-center">
+                                <Link href={`/${locale}/settings`} className="flex items-center">
                                     <Settings className="mr-2 h-4 w-4" />
                                     <span>Settings</span>
                                 </Link>

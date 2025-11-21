@@ -129,6 +129,33 @@
     "creditsAdded": "Gutschriften hinzugefügt:",
     "newBalance": "Ihr neues Guthaben:",
     "credits": "Gutschriften"
+  },
+  "about": {
+    "title": "Über PodBrief",
+    "description": "Wir haben es uns zur Aufgabe gemacht, Audio-Transkription und -Analyse für alle zugänglich zu machen.",
+    "missionTitle": "Unsere Mission",
+    "missionDescription": "Content-Erstellern, Forschern und Fachleuten mit modernster KI-Technologie zu befähigen, die Audioinhalte in umsetzbare Erkenntnisse verwandelt. Wir glauben, dass jede Stimme gehört und verstanden werden sollte.",
+    "valuesTitle": "Unsere Werte",
+    "valuesDescription": "Wir verpflichten uns zu Genauigkeit, Datenschutz und Benutzererfahrung. Ihr Inhalt gehört Ihnen, und wir sind hier, um Ihnen zu helfen, sein Potenzial zu entfalten und gleichzeitig Ihre Daten sicher und privat zu halten.",
+    "whyChooseTitle": "Warum PodBrief wählen?",
+    "whyChooseDescription": "Leistungsstarke Funktionen für moderne Content-Ersteller",
+    "aiPoweredTitle": "KI-gestützt",
+    "aiPoweredDescription": "Nutzung der Whisper- und GPT-Modelle von OpenAI für die genauesten Transkriptionen und intelligentesten Zusammenfassungen.",
+    "fastTitle": "Schnell und Effizient",
+    "fastDescription": "Erhalten Sie Ihre Transkriptionen und Zusammenfassungen in Minuten, nicht in Stunden. Verarbeiten Sie mehrere Dateien schnell und effizient.",
+    "secureTitle": "Sicher und Privat",
+    "secureDescription": "Ihre Daten sind verschlüsselt und sicher. Wir löschen Audio-Dateien automatisch nach 7 Tagen, um Ihre Privatsphäre zu schützen.",
+    "footerDescription": "KI-gestützte Transkription und Zusammenfassung für Ihre Podcasts."
+  },
+  "contact": {
+    "title": "Kontaktieren Sie uns",
+    "description": "Haben Sie eine Frage oder benötigen Sie Hilfe? Wir sind hier, um Ihnen zu helfen.",
+    "sendMessage": "Senden Sie uns eine Nachricht",
+    "formDescription": "Füllen Sie das untenstehende Formular aus und wir werden uns so schnell wie möglich bei Ihnen melden.",
+    "contactInfo": "Kontaktinformationen",
+    "email": "E-Mail",
+    "responseTime": "Antwortzeit",
+    "responseTimeValue": "Wir antworten normalerweise innerhalb von 24-48 Stunden"
   }
 }
 

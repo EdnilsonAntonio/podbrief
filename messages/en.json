@@ -129,6 +129,33 @@
     "creditsAdded": "Credits added:",
     "newBalance": "Your new balance:",
     "credits": "credits"
+  },
+  "about": {
+    "title": "About PodBrief",
+    "description": "We're on a mission to make audio transcription and analysis accessible to everyone.",
+    "missionTitle": "Our Mission",
+    "missionDescription": "To empower content creators, researchers, and professionals with cutting-edge AI technology that transforms audio content into actionable insights. We believe that every voice deserves to be heard and understood.",
+    "valuesTitle": "Our Values",
+    "valuesDescription": "We're committed to accuracy, privacy, and user experience. Your content is yours, and we're here to help you unlock its potential while keeping your data secure and private.",
+    "whyChooseTitle": "Why Choose PodBrief?",
+    "whyChooseDescription": "Powerful features designed for modern content creators",
+    "aiPoweredTitle": "AI-Powered",
+    "aiPoweredDescription": "Leveraging OpenAI's Whisper and GPT models for the most accurate transcriptions and intelligent summaries available.",
+    "fastTitle": "Fast & Efficient",
+    "fastDescription": "Get your transcriptions and summaries in minutes, not hours. Process multiple files quickly and efficiently.",
+    "secureTitle": "Secure & Private",
+    "secureDescription": "Your data is encrypted and secure. We automatically delete audio files after 7 days to protect your privacy.",
+    "footerDescription": "AI-powered transcription and summarization for your podcasts."
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "description": "Have a question or need help? We're here to assist you.",
+    "sendMessage": "Send us a Message",
+    "formDescription": "Fill out the form below and we'll get back to you as soon as possible.",
+    "contactInfo": "Contact Information",
+    "email": "Email",
+    "responseTime": "Response Time",
+    "responseTimeValue": "We typically respond within 24-48 hours"
   }
 }
 

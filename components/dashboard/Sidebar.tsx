@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLocale } from "next-intl";
 import {
     LayoutDashboard,
     FileAudio,
@@ -16,25 +17,26 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-const navigation = [
+// Navigation will be built dynamically with locale
+const getNavigation = (locale: string) => [
     {
         name: "Dashboard",
-        href: "/dashboard",
+        href: `/${locale}/dashboard`,
         icon: LayoutDashboard,
     },
     {
         name: "Transcriptions",
-        href: "/dashboard/transcriptions",
+        href: `/${locale}/dashboard/transcriptions`,
         icon: FileAudio,
     },
     {
         name: "Upload",
-        href: "/dashboard/upload",
+        href: `/${locale}/dashboard/upload`,
         icon: Upload,
     },
     {
         name: "Settings",
-        href: "/settings",
+        href: `/${locale}/settings`,
         icon: Settings,
     },
 ];
@@ -42,7 +44,10 @@ const navigation = [
 // Componente para o conteúdo de navegação (reutilizável)
 function NavContent({ onLinkClick }: { onLinkClick?: () => void }) {
     const pathname = usePathname();
+    const locale = useLocale();
 
+    const navigation = getNavigation(locale);
+    
     return (
         <nav className="space-y-1">
             {navigation.map((item) => {
