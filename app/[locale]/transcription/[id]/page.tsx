@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { useLocale } from "next-intl";
 
 interface TranscriptionData {
     id: string;
@@ -65,7 +66,7 @@ async function fetchTranscription(id: string): Promise<TranscriptionData> {
     return response.json();
 }
 
-export default function TranscriptionPage({ params }: { params: Promise<{ id: string }> }) {
+export default function TranscriptionPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
     const { id } = use(params);
     const { data: transcription, isLoading, error } = useQuery({
         queryKey: ["transcription", id],
@@ -209,6 +210,7 @@ function AudioPlayer({ audioFileId, filename }: { audioFileId: string; filename:
 }
 
 function TranscriptionContent({ transcription }: { transcription: TranscriptionData }) {
+    const locale = useLocale();
     const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
     const [isPublic, setIsPublic] = useState(transcription.isPublic || false);
     const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -352,11 +354,11 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                        <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                        <BreadcrumbLink href={`/${locale}/dashboard`}>Dashboard</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbLink href="/dashboard/transcriptions">Transcriptions</BreadcrumbLink>
+                        <BreadcrumbLink href={`/${locale}/dashboard/transcriptions`}>Transcriptions</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>

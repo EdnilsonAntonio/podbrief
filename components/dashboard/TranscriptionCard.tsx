@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { downloadTranscription } from "@/lib/download-utils";
 import { toast } from "sonner";
+import { useLocale } from "next-intl";
 
 interface TranscriptionCardData {
     id: string;
@@ -30,6 +33,8 @@ interface TranscriptionCardProps {
 }
 
 export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
+    const locale = useLocale();
+    
     const getStatusBadge = () => {
         switch (transcription.status) {
             case "completed":
@@ -103,7 +108,7 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
             {transcription.status === "completed" && (
                 <CardFooter className="flex gap-2">
                     <Button asChild variant="outline" size="sm" className="flex-1 hover:bg-accent/50 transition-colors">
-                        <Link href={`/transcription/${transcription.id}`}>
+                        <Link href={`/${locale}/transcription/${transcription.id}`}>
                             <Eye className="mr-2 h-4 w-4" />
                             View
                         </Link>
