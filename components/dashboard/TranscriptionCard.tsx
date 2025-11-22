@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { downloadTranscription } from "@/lib/download-utils";
 import { toast } from "sonner";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 interface TranscriptionCardData {
     id: string;
@@ -34,6 +34,7 @@ interface TranscriptionCardProps {
 
 export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
     const locale = useLocale();
+    const t = useTranslations();
     
     const getStatusBadge = () => {
         switch (transcription.status) {
@@ -41,28 +42,28 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
                 return (
                     <Badge variant="default" className="bg-green-500">
                         <CheckCircle2 className="mr-1 h-3 w-3" />
-                        Completed
+                        {t("transcriptions.completed")}
                     </Badge>
                 );
             case "processing":
                 return (
                     <Badge variant="secondary">
                         <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                        Processing
+                        {t("transcriptions.processing")}
                     </Badge>
                 );
             case "pending":
                 return (
                     <Badge variant="secondary">
                         <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                        Pending
+                        {t("transcriptions.pending")}
                     </Badge>
                 );
             case "error":
                 return (
                     <Badge variant="destructive">
                         <XCircle className="mr-1 h-3 w-3" />
-                        Error
+                        {t("transcriptions.error")}
                     </Badge>
                 );
             default:
@@ -92,7 +93,7 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
                 <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        <span>{transcription.duration} min</span>
+                        <span>{transcription.duration} {t("transcription.minutes")}</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <CreditCard className="h-4 w-4" />
@@ -100,7 +101,7 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
                             {transcription.creditsUsed % 1 === 0
                                 ? transcription.creditsUsed.toFixed(0)
                                 : transcription.creditsUsed.toFixed(2)}{" "}
-                            credits
+                            {t("transcription.credits")}
                         </span>
                     </div>
                 </div>
@@ -110,14 +111,14 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
                     <Button asChild variant="outline" size="sm" className="flex-1 hover:bg-accent/50 transition-colors">
                         <Link href={`/${locale}/transcription/${transcription.id}`}>
                             <Eye className="mr-2 h-4 w-4" />
-                            View
+                            {t("common.view")}
                         </Link>
                     </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm" className="flex-1 hover:bg-accent/50 transition-colors">
                                 <Download className="mr-2 h-4 w-4" />
-                                Download
+                                {t("transcription.download")}
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -125,9 +126,9 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
                                 onClick={async () => {
                                     try {
                                         await downloadTranscription(transcription.id, "txt");
-                                        toast.success("Download started");
+                                        toast.success(t("transcription.downloadStarted"));
                                     } catch (error) {
-                                        toast.error("Failed to download");
+                                        toast.error(t("transcription.downloadError"));
                                     }
                                 }}
                             >
@@ -138,9 +139,9 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
                                 onClick={async () => {
                                     try {
                                         await downloadTranscription(transcription.id, "json");
-                                        toast.success("Download started");
+                                        toast.success(t("transcription.downloadStarted"));
                                     } catch (error) {
-                                        toast.error("Failed to download");
+                                        toast.error(t("transcription.downloadError"));
                                     }
                                 }}
                             >
@@ -151,9 +152,9 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
                                 onClick={async () => {
                                     try {
                                         await downloadTranscription(transcription.id, "srt");
-                                        toast.success("Download started");
+                                        toast.success(t("transcription.downloadStarted"));
                                     } catch (error) {
-                                        toast.error("Failed to download");
+                                        toast.error(t("transcription.downloadError"));
                                     }
                                 }}
                             >

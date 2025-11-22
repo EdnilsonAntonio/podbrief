@@ -30,7 +30,8 @@
     "share": "Compartilhar",
     "copy": "Copiar",
     "language": "Idioma",
-    "credits": "Créditos"
+    "credits": "Créditos",
+    "view": "Ver"
   },
   "landing": {
     "badge": "Transcrição e Resumo com IA",
@@ -101,7 +102,9 @@
     "error": "Falha no upload",
     "insufficientCredits": "Créditos insuficientes",
     "fileTooLarge": "Arquivo muito grande",
-    "retentionNotice": "Nota: Os arquivos de áudio são excluídos automaticamente após 7 dias para privacidade."
+    "retentionNotice": "Nota: Os arquivos de áudio são excluídos automaticamente após 7 dias para privacidade.",
+    "uploadSuccess": "Arquivo ({size}MB) enviado com sucesso! Processando transcrição...",
+    "uploadSuccessSimple": "Arquivo enviado com sucesso! Processando transcrição..."
   },
   "pricing": {
     "title": "Preços",
@@ -399,7 +402,9 @@
     "copied": "Copiado para a área de transferência",
     "downloadedAs": "Baixado como {format}",
     "audioNotAvailable": "Arquivo de áudio não disponível",
-    "audioDeleted": "O arquivo de áudio pode ter sido excluído ou não está mais disponível."
+    "audioDeleted": "O arquivo de áudio pode ter sido excluído ou não está mais disponível.",
+    "downloadStarted": "Download iniciado",
+    "downloadError": "Falha ao baixar"
   },
   "upload": {
     "title": "Enviar Áudio",

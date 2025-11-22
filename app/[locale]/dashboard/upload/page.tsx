@@ -126,7 +126,7 @@ export default function UploadPage() {
                     const completeData = await completeResponse.json();
                     setUploadProgress(100);
 
-                    toast.success(`File (${fileSizeMB.toFixed(2)}MB) uploaded successfully! Processing transcription...`);
+                    toast.success(t("upload.uploadSuccess", { size: fileSizeMB.toFixed(2) }));
                     setTimeout(() => {
                         router.push(`/${locale}/dashboard/transcriptions`);
                     }, 1500);
@@ -225,7 +225,7 @@ export default function UploadPage() {
                 throw new Error(data?.error || data?.message || "Upload failed. Please try again.");
             }
 
-            toast.success("File uploaded successfully! Processing transcription...");
+            toast.success(t("upload.uploadSuccessSimple"));
 
             // Redirecionar para a página de transcrições após um breve delay
             setTimeout(() => {

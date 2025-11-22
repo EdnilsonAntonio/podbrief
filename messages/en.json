@@ -30,7 +30,8 @@
     "share": "Share",
     "copy": "Copy",
     "language": "Language",
-    "credits": "Credits"
+    "credits": "Credits",
+    "view": "View"
   },
   "landing": {
     "badge": "AI-Powered Transcription & Summarization",
@@ -101,7 +102,9 @@
     "error": "Upload failed",
     "insufficientCredits": "Insufficient credits",
     "fileTooLarge": "File too large",
-    "retentionNotice": "Note: Audio files are automatically deleted after 7 days for privacy."
+    "retentionNotice": "Note: Audio files are automatically deleted after 7 days for privacy.",
+    "uploadSuccess": "File ({size}MB) uploaded successfully! Processing transcription...",
+    "uploadSuccessSimple": "File uploaded successfully! Processing transcription..."
   },
   "pricing": {
     "title": "Pricing",
@@ -399,7 +402,9 @@
     "copied": "Copied to clipboard",
     "downloadedAs": "Downloaded as {format}",
     "audioNotAvailable": "Audio file not available",
-    "audioDeleted": "The audio file may have been deleted or is no longer available."
+    "audioDeleted": "The audio file may have been deleted or is no longer available.",
+    "downloadStarted": "Download started",
+    "downloadError": "Failed to download"
   },
   "upload": {
     "title": "Upload Audio",

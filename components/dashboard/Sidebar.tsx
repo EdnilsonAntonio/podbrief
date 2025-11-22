@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
     LayoutDashboard,
     FileAudio,
@@ -17,36 +17,34 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-// Navigation will be built dynamically with locale
-const getNavigation = (locale: string) => [
-    {
-        name: "Dashboard",
-        href: `/${locale}/dashboard`,
-        icon: LayoutDashboard,
-    },
-    {
-        name: "Transcriptions",
-        href: `/${locale}/dashboard/transcriptions`,
-        icon: FileAudio,
-    },
-    {
-        name: "Upload",
-        href: `/${locale}/dashboard/upload`,
-        icon: Upload,
-    },
-    {
-        name: "Settings",
-        href: `/${locale}/settings`,
-        icon: Settings,
-    },
-];
-
 // Componente para o conteúdo de navegação (reutilizável)
 function NavContent({ onLinkClick }: { onLinkClick?: () => void }) {
     const pathname = usePathname();
     const locale = useLocale();
+    const t = useTranslations();
 
-    const navigation = getNavigation(locale);
+    const navigation = [
+        {
+            name: t("dashboard.title"),
+            href: `/${locale}/dashboard`,
+            icon: LayoutDashboard,
+        },
+        {
+            name: t("transcriptions.title"),
+            href: `/${locale}/dashboard/transcriptions`,
+            icon: FileAudio,
+        },
+        {
+            name: t("upload.title"),
+            href: `/${locale}/dashboard/upload`,
+            icon: Upload,
+        },
+        {
+            name: t("settings.title"),
+            href: `/${locale}/settings`,
+            icon: Settings,
+        },
+    ];
     
     return (
         <nav className="space-y-1">
