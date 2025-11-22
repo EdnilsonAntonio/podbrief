@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -74,6 +74,7 @@ async function fetchInvoices(): Promise<Invoice[]> {
 
 export default function SettingsPage() {
     const locale = useLocale();
+    const t = useTranslations();
     const queryClient = useQueryClient();
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [editedName, setEditedName] = useState("");
@@ -113,11 +114,11 @@ export default function SettingsPage() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["user-profile"] });
-            toast.success("Profile updated successfully");
+            toast.success(t("settings.profileUpdated"));
             setIsEditDialogOpen(false);
         },
         onError: (error: Error) => {
-            toast.error(error.message || "Failed to update profile");
+            toast.error(error.message || t("settings.profileUpdateError"));
         },
     });
 
@@ -135,13 +136,13 @@ export default function SettingsPage() {
         if (file) {
             // Validar tipo
             if (!file.type.startsWith("image/")) {
-                toast.error("Please select an image file");
+                toast.error(t("settings.selectImage"));
                 return;
             }
 
             // Validar tamanho (5MB)
             if (file.size > 5 * 1024 * 1024) {
-                toast.error("Image size must be less than 5MB");
+                toast.error(t("settings.imageSizeError"));
                 return;
             }
 
@@ -170,7 +171,7 @@ export default function SettingsPage() {
 
                 if (!uploadResponse.ok) {
                     const error = await uploadResponse.json();
-                    throw new Error(error.error || "Failed to upload image");
+                    throw new Error(error.error || t("settings.uploadImageError"));
                 }
 
                 // Invalidar query para atualizar a imagem no Header
@@ -213,7 +214,7 @@ export default function SettingsPage() {
 
     const handleDeleteAccount = async () => {
         if (deleteConfirmText !== "DELETE") {
-            toast.error("Please type 'DELETE' to confirm");
+            toast.error(t("settings.confirmDelete"));
             return;
         }
 
@@ -228,7 +229,7 @@ export default function SettingsPage() {
                 throw new Error(error.error || "Failed to delete account");
             }
 
-            toast.success("Account deleted successfully. Redirecting...");
+            toast.success(t("settings.accountDeleted"));
             
             // Redirecionar para logout e depois para home
             setTimeout(() => {
@@ -237,7 +238,7 @@ export default function SettingsPage() {
         } catch (error) {
             console.error("Delete account error:", error);
             toast.error(
-                error instanceof Error ? error.message : "Failed to delete account"
+                error instanceof Error ? error.message : t("settings.deleteError")
             );
             setIsDeletingAccount(false);
         }
@@ -268,17 +269,17 @@ export default function SettingsPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{t("settings.title")}</h1>
                 <p className="text-muted-foreground">
-                    Manage your account settings and subscription
+                    {t("settings.description")}
                 </p>
             </div>
 
             {/* Profile Section */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Profile</CardTitle>
-                    <CardDescription>Your account information</CardDescription>
+                    <CardTitle>{t("settings.profile")}</CardTitle>
+                    <CardDescription>{t("settings.profileDescription")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {user && (
@@ -290,29 +291,29 @@ export default function SettingsPage() {
                                 </AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
-                                <h3 className="text-lg font-semibold">{user.name || "User"}</h3>
+                                <h3 className="text-lg font-semibold">{user.name || t("settings.user")}</h3>
                                 <p className="text-sm text-muted-foreground break-all">{user.email}</p>
                                 <p className="text-xs text-muted-foreground mt-1">
-                                    Member since {format(new Date(user.createdAt), "MMMM yyyy")}
+                                    {t("settings.memberSince", { date: format(new Date(user.createdAt), "MMMM yyyy") })}
                                 </p>
                             </div>
                                    <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                                        <DialogTrigger asChild>
                                            <Button variant="outline" className="w-full sm:w-auto" onClick={handleEditClick}>
                                                <Edit className="mr-2 h-4 w-4" />
-                                               Edit Profile
+                                               {t("settings.editProfile")}
                                            </Button>
                                        </DialogTrigger>
                                        <DialogContent>
                                            <DialogHeader>
-                                               <DialogTitle>Edit Profile</DialogTitle>
+                                               <DialogTitle>{t("settings.editProfile")}</DialogTitle>
                                                <DialogDescription>
-                                                   Update your profile information. Your email cannot be changed.
+                                                   {t("settings.editDescription")}
                                                </DialogDescription>
                                            </DialogHeader>
                                            <div className="space-y-4 py-4">
                                                <div className="space-y-2">
-                                                   <Label htmlFor="email">Email</Label>
+                                                   <Label htmlFor="email">{t("settings.email")}</Label>
                                                    <Input
                                                        id="email"
                                                        type="email"
@@ -321,11 +322,11 @@ export default function SettingsPage() {
                                                        className="bg-muted"
                                                    />
                                                    <p className="text-xs text-muted-foreground">
-                                                       Your email is managed by your authentication provider and cannot be changed here.
+                                                       {t("settings.emailDescription")}
                                                    </p>
                                                </div>
                                                <div className="space-y-2">
-                                                   <Label htmlFor="avatar">Profile Picture</Label>
+                                                   <Label htmlFor="avatar">{t("settings.profilePicture")}</Label>
                                                    <div className="flex items-center gap-4">
                                                        <Avatar className="h-20 w-20">
                                                            <AvatarImage 
@@ -344,19 +345,19 @@ export default function SettingsPage() {
                                                                className="cursor-pointer"
                                                            />
                                                            <p className="text-xs text-muted-foreground mt-1">
-                                                               JPG, PNG or GIF. Max size 5MB.
+                                                               {t("settings.imageFormat")}
                                                            </p>
                                                        </div>
                                                    </div>
                                                </div>
                                                <div className="space-y-2">
-                                                   <Label htmlFor="name">Name</Label>
+                                                   <Label htmlFor="name">{t("settings.name")}</Label>
                                                    <Input
                                                        id="name"
                                                        type="text"
                                                        value={editedName}
                                                        onChange={(e) => setEditedName(e.target.value)}
-                                                       placeholder="Enter your name"
+                                                       placeholder={t("settings.enterName")}
                                                        maxLength={100}
                                                    />
                                                </div>
@@ -366,13 +367,13 @@ export default function SettingsPage() {
                                                        onClick={() => setIsEditDialogOpen(false)}
                                                        disabled={updateProfileMutation.isPending}
                                                    >
-                                                       Cancel
+                                                       {t("settings.cancel")}
                                                    </Button>
                                                    <Button
                                                        onClick={handleSave}
                                                        disabled={updateProfileMutation.isPending || (editedName === (user?.name || "") && !selectedImage)}
                                                    >
-                                                       {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
+                                                       {updateProfileMutation.isPending ? t("settings.saving") : t("settings.saveChanges")}
                                                    </Button>
                                                </div>
                                            </div>
@@ -386,8 +387,8 @@ export default function SettingsPage() {
             {/* Credits Section */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Credits</CardTitle>
-                    <CardDescription>Your available credits and purchase options</CardDescription>
+                    <CardTitle>{t("settings.credits")}</CardTitle>
+                    <CardDescription>{t("settings.creditsDescription")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {user && (
@@ -398,16 +399,16 @@ export default function SettingsPage() {
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <h3 className="font-semibold">Available Credits</h3>
+                                        <h3 className="font-semibold">{t("settings.availableCredits")}</h3>
                                     </div>
                                     <p className="text-sm text-muted-foreground">
-                                        {user.credits % 1 === 0
+                                        {(user.credits % 1 === 0
                                             ? user.credits.toFixed(0)
-                                            : user.credits.toFixed(2)}{" "}
-                                        {user.credits === 1 ? "credit" : "credits"} available
+                                            : user.credits.toFixed(2))}{" "}
+                                        {t("common.credits")} {t("settings.creditsAvailable")}
                                     </p>
                                     <p className="text-xs text-muted-foreground mt-1">
-                                        1 credit = 1 minute of transcription
+                                        {t("settings.creditEquals")}
                                     </p>
                                 </div>
                             </div>
@@ -417,7 +418,7 @@ export default function SettingsPage() {
                                         ? user.credits.toFixed(0)
                                         : user.credits.toFixed(2)}
                                 </p>
-                                <p className="text-xs text-muted-foreground">credits</p>
+                                <p className="text-xs text-muted-foreground">{t("settings.credits")}</p>
                             </div>
                         </div>
                     )}
@@ -426,10 +427,10 @@ export default function SettingsPage() {
 
                     <div className="space-y-2">
                         <p className="text-sm text-muted-foreground">
-                            Purchase credits to transcribe your audio files. Credits never expire and can be used anytime.
+                            {t("settings.purchaseDescription")}
                         </p>
                         <Button className="w-full" asChild>
-                            <a href={`/${locale}/pricing`}>Purchase Credits</a>
+                            <a href={`/${locale}/pricing`}>{t("settings.purchaseCredits")}</a>
                         </Button>
                     </div>
                 </CardContent>
@@ -438,8 +439,8 @@ export default function SettingsPage() {
             {/* Payment Method */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Payment Method</CardTitle>
-                    <CardDescription>Manage your payment information</CardDescription>
+                    <CardTitle>{t("settings.paymentMethod")}</CardTitle>
+                    <CardDescription>{t("settings.paymentDescription")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {invoices && invoices.length > 0 ? (
@@ -447,9 +448,9 @@ export default function SettingsPage() {
                             <div className="flex items-center gap-4">
                                 <CreditCard className="h-6 w-6 text-muted-foreground flex-shrink-0" />
                                 <div>
-                                    <p className="font-medium">Payment method on file</p>
+                                    <p className="font-medium">{t("settings.paymentOnFile")}</p>
                                     <p className="text-sm text-muted-foreground">
-                                        {invoices[0].stripePaymentId ? "Stripe payment method" : "No payment method"}
+                                        {invoices[0].stripePaymentId ? t("settings.stripePayment") : t("settings.noPaymentMethod")}
                                     </p>
                                 </div>
                             </div>
@@ -459,13 +460,13 @@ export default function SettingsPage() {
                                        onClick={handleUpdatePaymentMethod}
                                        disabled={isLoadingPaymentPortal}
                                    >
-                                       {isLoadingPaymentPortal ? "Loading..." : "Update"}
+                                       {isLoadingPaymentPortal ? t("settings.loading") : t("settings.update")}
                                    </Button>
                         </div>
                     ) : (
                         <div className="rounded-lg border p-4 text-center">
                             <p className="text-sm text-muted-foreground">
-                                No payment method on file. Add one when you upgrade your plan.
+                                {t("settings.noPaymentOnFile")}
                             </p>
                         </div>
                     )}
@@ -475,8 +476,8 @@ export default function SettingsPage() {
             {/* Billing History */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Billing History</CardTitle>
-                    <CardDescription>Your recent invoices and payments</CardDescription>
+                    <CardTitle>{t("settings.billingHistory")}</CardTitle>
+                    <CardDescription>{t("settings.billingDescription")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {isLoadingInvoices ? (
@@ -499,12 +500,12 @@ export default function SettingsPage() {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Date</TableHead>
-                                        <TableHead>Plan</TableHead>
-                                        <TableHead>Credits</TableHead>
-                                        <TableHead>Amount</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                        <TableHead>{t("settings.date")}</TableHead>
+                                        <TableHead>{t("settings.plan")}</TableHead>
+                                        <TableHead>{t("settings.credits")}</TableHead>
+                                        <TableHead>{t("settings.amount")}</TableHead>
+                                        <TableHead>{t("settings.status")}</TableHead>
+                                        <TableHead className="text-right">{t("settings.actions")}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -546,10 +547,10 @@ export default function SettingsPage() {
                                                         a.click();
                                                         window.URL.revokeObjectURL(url);
                                                         document.body.removeChild(a);
-                                                        toast.success("Invoice downloaded");
+                                                        toast.success(t("settings.invoiceDownloaded"));
                                                     } catch (error) {
                                                         console.error("Download error:", error);
-                                                        toast.error("Failed to download invoice");
+                                                        toast.error(t("settings.downloadInvoiceError"));
                                                     }
                                                 }}
                                             >
@@ -564,7 +565,7 @@ export default function SettingsPage() {
                     ) : (
                         <div className="text-center py-8">
                             <p className="text-sm text-muted-foreground">
-                                No billing history yet. Purchase credits to see invoices here.
+                                {t("settings.noBillingHistory")}
                             </p>
                         </div>
                     )}
@@ -574,54 +575,52 @@ export default function SettingsPage() {
             {/* Danger Zone */}
             <Card className="border-destructive">
                 <CardHeader>
-                    <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                    <CardTitle className="text-destructive">{t("settings.dangerZone")}</CardTitle>
                     <CardDescription>
-                        Irreversible and destructive actions
+                        {t("settings.dangerDescription")}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-destructive/50 bg-destructive/5 p-4">
                         <div className="flex-1">
-                            <h3 className="font-semibold text-destructive mb-1">Delete Account</h3>
+                            <h3 className="font-semibold text-destructive mb-1">{t("settings.deleteAccount")}</h3>
                             <p className="text-sm text-muted-foreground">
-                                Once you delete your account, there is no going back. This will permanently 
-                                delete your account, all transcriptions, audio files, and associated data.
+                                {t("settings.deleteDescription")}
                             </p>
                         </div>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button variant="destructive" className="w-full sm:w-auto">
                                     <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete Account
+                                    {t("settings.deleteAccount")}
                                 </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                                 <AlertDialogHeader>
                                     <AlertDialogTitle className="flex items-center gap-2">
                                         <AlertTriangle className="h-5 w-5 text-destructive" />
-                                        Are you absolutely sure?
+                                        {t("settings.areYouSure")}
                                     </AlertDialogTitle>
                                     <AlertDialogDescription className="space-y-2">
                                         <p>
-                                            This action cannot be undone. This will permanently delete your account 
-                                            and remove all of your data from our servers.
+                                            {t("settings.cannotUndo")}
                                         </p>
                                         <p className="font-semibold">
-                                            This includes:
+                                            {t("settings.includes")}
                                         </p>
                                         <ul className="list-disc pl-6 space-y-1 text-sm">
-                                            <li>All your transcriptions and summaries</li>
-                                            <li>All uploaded audio files</li>
-                                            <li>Your profile information</li>
-                                            <li>Your credit purchase history</li>
-                                            <li>All other account data</li>
+                                            <li>{t("settings.includesTranscriptions")}</li>
+                                            <li>{t("settings.includesAudio")}</li>
+                                            <li>{t("settings.includesProfile")}</li>
+                                            <li>{t("settings.includesHistory")}</li>
+                                            <li>{t("settings.includesData")}</li>
                                         </ul>
                                         <p className="pt-2">
-                                            Type <strong className="text-foreground">DELETE</strong> to confirm:
+                                            {t("settings.typeDelete")}
                                         </p>
                                         <Input
                                             type="text"
-                                            placeholder="Type DELETE to confirm"
+                                            placeholder={t("settings.typeDeletePlaceholder")}
                                             value={deleteConfirmText}
                                             onChange={(e) => setDeleteConfirmText(e.target.value)}
                                             className="mt-2"
@@ -633,7 +632,7 @@ export default function SettingsPage() {
                                         onClick={() => setDeleteConfirmText("")}
                                         disabled={isDeletingAccount}
                                     >
-                                        Cancel
+                                        {t("settings.cancel")}
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                         onClick={handleDeleteAccount}
@@ -643,12 +642,12 @@ export default function SettingsPage() {
                                         {isDeletingAccount ? (
                                             <>
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Deleting...
+                                                {t("settings.deleting")}
                                             </>
                                         ) : (
                                             <>
                                                 <Trash2 className="mr-2 h-4 w-4" />
-                                                Delete Account
+                                                {t("settings.deleteAccount")}
                                             </>
                                         )}
                                     </AlertDialogAction>

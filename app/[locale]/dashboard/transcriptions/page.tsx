@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { TranscriptionCard } from "@/components/dashboard/TranscriptionCard";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,7 @@ async function fetchTranscriptions(): Promise<Transcription[]> {
 
 export default function TranscriptionsPage() {
     const locale = useLocale();
+    const t = useTranslations();
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -141,9 +142,9 @@ export default function TranscriptionsPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">All Transcriptions</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{t("transcriptions.title")}</h1>
                 <p className="text-muted-foreground">
-                    View and manage all your audio transcriptions
+                    {t("transcriptions.description")}
                 </p>
             </div>
 
@@ -151,7 +152,7 @@ export default function TranscriptionsPage() {
                 <div className="relative flex-1 w-full sm:max-w-sm">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
-                        placeholder="Search by filename..."
+                        placeholder={t("transcriptions.searchPlaceholder")}
                         className="pl-9"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -171,12 +172,12 @@ export default function TranscriptionsPage() {
                     <Filter className="h-4 w-4 text-muted-foreground" />
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
                         <SelectTrigger className="w-full sm:w-[180px]">
-                            <SelectValue placeholder="Filter by status" />
+                            <SelectValue placeholder={t("transcriptions.filterByStatus")} />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">
                                 <span className="flex items-center gap-2">
-                                    All Status
+                                    {t("transcriptions.allStatus")}
                                     <Badge variant="secondary" className="ml-auto">
                                         {statusCounts.all}
                                     </Badge>
@@ -184,7 +185,7 @@ export default function TranscriptionsPage() {
                             </SelectItem>
                             <SelectItem value="completed">
                                 <span className="flex items-center gap-2">
-                                    Completed
+                                    {t("transcriptions.completed")}
                                     <Badge variant="secondary" className="ml-auto">
                                         {statusCounts.completed}
                                     </Badge>
@@ -192,7 +193,7 @@ export default function TranscriptionsPage() {
                             </SelectItem>
                             <SelectItem value="processing">
                                 <span className="flex items-center gap-2">
-                                    Processing
+                                    {t("transcriptions.processing")}
                                     <Badge variant="secondary" className="ml-auto">
                                         {statusCounts.processing}
                                     </Badge>
@@ -200,7 +201,7 @@ export default function TranscriptionsPage() {
                             </SelectItem>
                             <SelectItem value="pending">
                                 <span className="flex items-center gap-2">
-                                    Pending
+                                    {t("transcriptions.pending")}
                                     <Badge variant="secondary" className="ml-auto">
                                         {statusCounts.pending}
                                     </Badge>
@@ -208,7 +209,7 @@ export default function TranscriptionsPage() {
                             </SelectItem>
                             <SelectItem value="error">
                                 <span className="flex items-center gap-2">
-                                    Error
+                                    {t("transcriptions.error")}
                                     <Badge variant="secondary" className="ml-auto">
                                         {statusCounts.error}
                                     </Badge>
@@ -223,7 +224,7 @@ export default function TranscriptionsPage() {
             {(searchQuery || statusFilter !== "all") && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span>
-                        Showing {filteredTranscriptions.length} of {transcriptions?.length || 0} transcriptions
+                        {t("transcriptions.showing", { count: filteredTranscriptions.length, total: transcriptions?.length || 0 })}
                     </span>
                     {(searchQuery || statusFilter !== "all") && (
                         <Button
@@ -235,7 +236,7 @@ export default function TranscriptionsPage() {
                             }}
                             className="h-auto p-0 text-xs"
                         >
-                            Clear filters
+                            {t("transcriptions.clearFilters")}
                         </Button>
                     )}
                 </div>
@@ -298,12 +299,12 @@ export default function TranscriptionsPage() {
             ) : transcriptions && transcriptions.length > 0 ? (
                 <div className="text-center py-12">
                     <p className="text-muted-foreground">
-                        No transcriptions match your filters. Try adjusting your search or filters.
+                        {t("transcriptions.noMatches")}
                     </p>
                 </div>
             ) : (
                 <div className="text-center py-12">
-                    <p className="text-muted-foreground">No transcriptions yet. Upload an audio file to get started!</p>
+                    <p className="text-muted-foreground">{t("transcriptions.empty")}</p>
                 </div>
             )}
         </div>

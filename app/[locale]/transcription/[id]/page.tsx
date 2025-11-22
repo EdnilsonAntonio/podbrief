@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 interface TranscriptionData {
     id: string;
@@ -211,6 +211,7 @@ function AudioPlayer({ audioFileId, filename }: { audioFileId: string; filename:
 
 function TranscriptionContent({ transcription }: { transcription: TranscriptionData }) {
     const locale = useLocale();
+    const t = useTranslations();
     const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
     const [isPublic, setIsPublic] = useState(transcription.isPublic || false);
     const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -251,10 +252,10 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
             const data = await response.json();
             setIsPublic(enabled);
             setShareUrl(data.shareUrl || null);
-            toast.success(enabled ? "Transcription is now public" : "Transcription is now private");
+            toast.success(enabled ? t("transcription.nowPublic") : t("transcription.nowPrivate"));
         } catch (error) {
             console.error("Error toggling share:", error);
-            toast.error("Failed to update share status");
+            toast.error(t("transcription.shareUpdateError"));
         } finally {
             setIsLoadingShare(false);
         }
@@ -263,13 +264,13 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
     const handleCopyShareLink = () => {
         if (shareUrl) {
             navigator.clipboard.writeText(shareUrl);
-            toast.success("Share link copied to clipboard!");
+            toast.success(t("transcription.linkCopied"));
         }
     };
 
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text);
-        toast.success("Copied to clipboard");
+        toast.success(t("transcription.copied"));
     };
 
     const handleDownload = (content: string, filename: string, format: "txt" | "json" | "srt" = "txt") => {
@@ -316,7 +317,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
         a.download = `${filename}.${extension}`;
         a.click();
         URL.revokeObjectURL(url);
-        toast.success(`Downloaded as ${extension.toUpperCase()}`);
+        toast.success(t("transcription.downloadedAs", { format: extension.toUpperCase() }));
     };
 
     const generateSRT = (text: string, durationSeconds: number) => {
@@ -354,15 +355,15 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                        <BreadcrumbLink href={`/${locale}/dashboard`}>Dashboard</BreadcrumbLink>
+                        <BreadcrumbLink href={`/${locale}/dashboard`}>{t("transcription.dashboard")}</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbLink href={`/${locale}/dashboard/transcriptions`}>Transcriptions</BreadcrumbLink>
+                        <BreadcrumbLink href={`/${locale}/dashboard/transcriptions`}>{t("transcription.transcriptions")}</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbPage>{transcription.audioFile.originalFilename || "Transcription"}</BreadcrumbPage>
+                        <BreadcrumbPage>{transcription.audioFile.originalFilename || t("transcription.transcription")}</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
@@ -370,7 +371,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex-1">
                     <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                        {transcription.audioFile.originalFilename || "Transcription"}
+                        {transcription.audioFile.originalFilename || t("transcription.transcription")}
                     </h1>
                     <div className="mt-2 flex flex-wrap gap-2 sm:gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
@@ -380,7 +381,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                         {transcription.audioFile.durationSeconds && (
                             <div className="flex items-center gap-1">
                                 <Clock className="h-4 w-4" />
-                                <span>{Math.ceil(transcription.audioFile.durationSeconds / 60)} minutes</span>
+                                <span>{Math.ceil(transcription.audioFile.durationSeconds / 60)} {t("transcription.minutes")}</span>
                             </div>
                         )}
                         <div className="flex items-center gap-1">
@@ -389,7 +390,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                                 {transcription.costCredits % 1 === 0
                                     ? transcription.costCredits.toFixed(0)
                                     : transcription.costCredits.toFixed(2)}{" "}
-                                credits
+                                {t("transcription.credits")}
                             </span>
                         </div>
                     </div>
@@ -400,13 +401,13 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                         onClick={() => handleCopy(transcription.text)}
                     >
                         <Copy className="mr-2 h-4 w-4" />
-                        Copy
+                        {t("transcription.copy")}
                     </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline">
                                 <Download className="mr-2 h-4 w-4" />
-                                Download
+                                {t("transcription.download")}
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -418,7 +419,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                                 )}
                             >
                                 <FileText className="mr-2 h-4 w-4" />
-                                Download as TXT
+                                {t("transcription.downloadTxt")}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => handleDownload(
@@ -428,7 +429,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                                 )}
                             >
                                 <FileJson className="mr-2 h-4 w-4" />
-                                Download as JSON
+                                {t("transcription.downloadJson")}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => handleDownload(
@@ -438,7 +439,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                                 )}
                             >
                                 <FileText className="mr-2 h-4 w-4" />
-                                Download as SRT (Subtitles)
+                                {t("transcription.downloadSrt")}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -446,22 +447,22 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                         <DialogTrigger asChild>
                             <Button variant="outline">
                                 <Share2 className="mr-2 h-4 w-4" />
-                                Share
+                                {t("transcription.share")}
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Share Transcription</DialogTitle>
+                                <DialogTitle>{t("transcription.shareTitle")}</DialogTitle>
                                 <DialogDescription>
-                                    Make this transcription publicly accessible via a shareable link.
+                                    {t("transcription.shareDescription")}
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="flex items-center justify-between">
                                     <div className="space-y-0.5">
-                                        <Label htmlFor="share-toggle">Public sharing</Label>
+                                        <Label htmlFor="share-toggle">{t("transcription.publicSharing")}</Label>
                                         <p className="text-sm text-muted-foreground">
-                                            Anyone with the link can view this transcription
+                                            {t("transcription.publicSharingDescription")}
                                         </p>
                                     </div>
                                     <Switch
@@ -474,7 +475,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
 
                                 {isPublic && shareUrl && (
                                     <div className="space-y-2">
-                                        <Label>Share Link</Label>
+                                        <Label>{t("transcription.shareLink")}</Label>
                                         <div className="flex items-center gap-2">
                                             <div className="flex-1 flex items-center gap-2 px-3 py-2 border rounded-md bg-muted">
                                                 <Link2 className="h-4 w-4 text-muted-foreground" />
@@ -494,7 +495,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                                             </Button>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
-                                            Copy this link to share with others
+                                            {t("transcription.copyLinkDescription")}
                                         </p>
                                     </div>
                                 )}
@@ -502,7 +503,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                                 {!isPublic && (
                                     <div className="rounded-lg border bg-muted p-4">
                                         <p className="text-sm text-muted-foreground">
-                                            This transcription is private. Enable sharing to generate a public link.
+                                            {t("transcription.privateDescription")}
                                         </p>
                                     </div>
                                 )}
@@ -515,7 +516,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
             {/* Audio Player */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Audio Player</CardTitle>
+                    <CardTitle>{t("transcription.audioPlayer")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <AudioPlayer audioFileId={transcription.audioFile.id} filename={transcription.audioFile.originalFilename || "audio"} />
@@ -525,14 +526,14 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
             {/* Tabs */}
             <Tabs defaultValue="transcription" className="space-y-4">
                 <TabsList>
-                    <TabsTrigger value="transcription">Transcription</TabsTrigger>
-                    <TabsTrigger value="summary">Summary</TabsTrigger>
+                    <TabsTrigger value="transcription">{t("transcription.transcriptionTab")}</TabsTrigger>
+                    <TabsTrigger value="summary">{t("transcription.summaryTab")}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="transcription" className="space-y-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Full Transcription</CardTitle>
+                            <CardTitle>{t("transcription.fullTranscription")}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="prose max-w-none whitespace-pre-wrap text-sm">
@@ -548,7 +549,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                             {transcription.summary.shortSummary && (
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Short Summary</CardTitle>
+                                        <CardTitle>{t("transcription.shortSummary")}</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <p className="text-sm">{transcription.summary.shortSummary}</p>
@@ -559,7 +560,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                             {transcription.summary.longSummary && (
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Long Summary</CardTitle>
+                                        <CardTitle>{t("transcription.longSummary")}</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <p className="text-sm">{transcription.summary.longSummary}</p>
@@ -570,7 +571,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                             {transcription.summary.bulletPoints && (
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Key Points</CardTitle>
+                                        <CardTitle>{t("transcription.keyPoints")}</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <ul className="list-disc space-y-2 pl-6 text-sm">
@@ -586,7 +587,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                                 {transcription.summary.keywords && (
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Keywords</CardTitle>
+                                            <CardTitle>{t("transcription.keywords")}</CardTitle>
                                         </CardHeader>
                                         <CardContent>
                                             <div className="flex flex-wrap gap-2">
@@ -603,7 +604,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                                 {transcription.summary.sentiment && (
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Sentiment</CardTitle>
+                                            <CardTitle>{t("transcription.sentiment")}</CardTitle>
                                         </CardHeader>
                                         <CardContent>
                                             <Badge
@@ -625,7 +626,7 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
                     ) : (
                         <Card>
                             <CardContent className="py-8 text-center">
-                                <p className="text-muted-foreground">Summary not available yet. This feature will be implemented soon.</p>
+                                <p className="text-muted-foreground">{t("transcription.summaryNotAvailable")}</p>
                             </CardContent>
                         </Card>
                     )}
@@ -634,4 +635,5 @@ function TranscriptionContent({ transcription }: { transcription: TranscriptionD
         </div>
     );
 }
+
 

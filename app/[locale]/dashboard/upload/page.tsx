@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -13,6 +13,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 export default function UploadPage() {
     const router = useRouter();
     const locale = useLocale();
+    const t = useTranslations();
     const [file, setFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
@@ -254,17 +255,17 @@ export default function UploadPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Upload Audio</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{t("upload.title")}</h1>
                 <p className="text-muted-foreground">
-                    Upload your podcast audio file to generate transcription and summary
+                    {t("upload.description")}
                 </p>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Select Audio File</CardTitle>
+                    <CardTitle>{t("upload.selectFile")}</CardTitle>
                     <CardDescription>
-                        Supported formats: MP3, WAV, M4A, OGG, FLAC (Max 300MB)
+                        {t("upload.supportedFormats")}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -289,13 +290,13 @@ export default function UploadPage() {
                                 <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                                 <p className="text-sm font-medium mb-2">
                                     {isDragOver
-                                        ? "Drop the file here"
-                                        : "Drag & drop your audio file here"}
+                                        ? t("upload.dropHere")
+                                        : t("upload.dragDrop")}
                                 </p>
-                                <p className="text-xs text-muted-foreground mb-4">or</p>
+                                <p className="text-xs text-muted-foreground mb-4">{t("upload.or")}</p>
                                 <Button variant="outline" asChild>
                                     <label htmlFor="audio-upload" className="cursor-pointer" aria-label="Browse files to upload">
-                                        Browse Files
+                                        {t("upload.browseFiles")}
                                     </label>
                                 </Button>
                             </div>
@@ -331,7 +332,7 @@ export default function UploadPage() {
                             {isUploading && (
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="text-muted-foreground">Uploading...</span>
+                                        <span className="text-muted-foreground">{t("upload.uploading")}</span>
                                         <span className="text-muted-foreground">{uploadProgress}%</span>
                                     </div>
                                     <Progress value={uploadProgress} className="h-2" />
@@ -342,7 +343,7 @@ export default function UploadPage() {
                                 disabled={isUploading}
                                 className="w-full"
                             >
-                                {isUploading ? "Uploading..." : "Start Transcription"}
+                                {isUploading ? t("upload.uploading") : t("upload.startTranscription")}
                             </Button>
                         </div>
                     )}
@@ -352,16 +353,16 @@ export default function UploadPage() {
             <Alert className="border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950">
                 <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 <AlertTitle className="text-blue-900 dark:text-blue-100">
-                    Audio File Retention
+                    {t("upload.retentionTitle")}
                 </AlertTitle>
                 <AlertDescription className="text-blue-800 dark:text-blue-200">
-                    Audio files are automatically deleted after 7 days to save storage space. Your transcriptions and summaries will be permanently saved and remain accessible.
+                    {t("upload.retentionDescription")}
                 </AlertDescription>
             </Alert>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>How it works</CardTitle>
+                    <CardTitle>{t("upload.howItWorks")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <ol className="space-y-4">
@@ -370,9 +371,9 @@ export default function UploadPage() {
                                 1
                             </span>
                             <div>
-                                <p className="font-medium">Upload your audio file</p>
+                                <p className="font-medium">{t("upload.step1Title")}</p>
                                 <p className="text-sm text-muted-foreground">
-                                    Select or drag and drop your podcast audio file
+                                    {t("upload.step1Description")}
                                 </p>
                             </div>
                         </li>
@@ -381,9 +382,9 @@ export default function UploadPage() {
                                 2
                             </span>
                             <div>
-                                <p className="font-medium">AI Transcription</p>
+                                <p className="font-medium">{t("upload.step2Title")}</p>
                                 <p className="text-sm text-muted-foreground">
-                                    Our AI processes your audio using Whisper API
+                                    {t("upload.step2Description")}
                                 </p>
                             </div>
                         </li>
@@ -392,9 +393,9 @@ export default function UploadPage() {
                                 3
                             </span>
                             <div>
-                                <p className="font-medium">Get Summary</p>
+                                <p className="font-medium">{t("upload.step3Title")}</p>
                                 <p className="text-sm text-muted-foreground">
-                                    Receive detailed transcription and AI-generated summary
+                                    {t("upload.step3Description")}
                                 </p>
                             </div>
                         </li>
