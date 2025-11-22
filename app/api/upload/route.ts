@@ -241,9 +241,11 @@ async function processTranscription(
     
     console.log(`✅ [${audioFileId}] Transcription received from OpenAI`);
 
-    // Extrair o texto da transcrição
+    // Extrair o texto e idioma da transcrição
     const transcriptionText = (transcriptionResponse as any).text;
+    const detectedLanguage = (transcriptionResponse as any).language || null;
     console.log(`📄 [${audioFileId}] Transcription text length: ${transcriptionText.length} characters`);
+    console.log(`🌐 [${audioFileId}] Detected language: ${detectedLanguage || "unknown"}`);
 
     // Obter duração real do áudio
     let durationSeconds = null;
@@ -334,7 +336,8 @@ async function processTranscription(
     console.log(`✅ [${audioFileId}] Status updated to completed`);
 
     // Gerar resumo com GPT (assíncrono, não bloqueia)
-    generateSummary(transcriptionRecord.id, transcriptionText).catch(
+    // Passar o idioma detectado para gerar o resumo no mesmo idioma
+    generateSummary(transcriptionRecord.id, transcriptionText, detectedLanguage).catch(
       (error) => {
         console.error(`❌ [${audioFileId}] Error generating summary:`, error);
       }
@@ -407,20 +410,48 @@ async function processTranscription(
 
 async function generateSummary(
   transcriptionId: string,
-  transcriptionText: string
+  transcriptionText: string,
+  detectedLanguage: string | null = null
 ) {
   try {
     const { openai } = await import("@/lib/openai");
 
+    // Mapear códigos de idioma para nomes completos (para instruções mais claras)
+    const languageMap: Record<string, string> = {
+      en: "English",
+      pt: "Portuguese",
+      es: "Spanish",
+      fr: "French",
+      de: "German",
+      it: "Italian",
+      ja: "Japanese",
+      ko: "Korean",
+      zh: "Chinese",
+      ru: "Russian",
+      ar: "Arabic",
+      hi: "Hindi",
+      nl: "Dutch",
+      sv: "Swedish",
+      pl: "Polish",
+      tr: "Turkish",
+    };
+
+    const languageName = detectedLanguage ? languageMap[detectedLanguage] || detectedLanguage : null;
+    const languageInstruction = languageName 
+      ? `IMPORTANT: The transcription is in ${languageName} (${detectedLanguage}). You MUST generate the summary, bullet points, and keywords in the SAME language (${languageName}). Do not translate to English.`
+      : "Generate the summary in the same language as the transcription.";
+
     // Criar prompt para gerar resumo
-    const prompt = `Analyze the following transcription and provide a comprehensive summary. Return your response as a JSON object with the following structure:
+    const prompt = `Analyze the following transcription and provide a comprehensive summary. ${languageInstruction}
+
+Return your response as a JSON object with the following structure:
 {
-  "shortSummary": "A brief 2-3 sentence summary",
-  "longSummary": "A detailed paragraph summary (4-5 sentences)",
-  "bulletPoints": "Key points separated by newlines (one per line)",
-  "keywords": "Comma-separated list of important keywords",
+  "shortSummary": "A brief 2-3 sentence summary (in the same language as the transcription)",
+  "longSummary": "A detailed paragraph summary (4-5 sentences, in the same language as the transcription)",
+  "bulletPoints": "Key points separated by newlines (one per line, in the same language as the transcription)",
+  "keywords": "Comma-separated list of important keywords (in the same language as the transcription)",
   "sentiment": "positive, negative, or neutral",
-  "language": "Language code (e.g., 'en', 'pt', 'es')"
+  "language": "Language code (e.g., 'en', 'pt', 'es') - must match the transcription language"
 }
 
 Transcription:
@@ -435,7 +466,7 @@ ${transcriptionText.substring(0, 15000)}${
         {
           role: "system",
           content:
-            "You are a helpful assistant that analyzes transcriptions and provides structured summaries in JSON format.",
+            `You are a helpful assistant that analyzes transcriptions and provides structured summaries in JSON format. ${languageInstruction} Always maintain the original language of the transcription in your summaries.`,
         },
         {
           role: "user",
@@ -454,6 +485,9 @@ ${transcriptionText.substring(0, 15000)}${
 
     const summaryData = JSON.parse(responseContent);
 
+    // Usar o idioma detectado se o GPT não retornou ou se retornou diferente
+    const finalLanguage = detectedLanguage || summaryData.language || null;
+
     // Salvar resumo no banco de dados
     await prisma.summary.create({
       data: {
@@ -463,12 +497,12 @@ ${transcriptionText.substring(0, 15000)}${
         bulletPoints: summaryData.bulletPoints || null,
         keywords: summaryData.keywords || null,
         sentiment: summaryData.sentiment || null,
-        language: summaryData.language || null,
+        language: finalLanguage,
       },
     });
 
     console.log(
-      `Summary generated successfully for transcription ${transcriptionId}`
+      `Summary generated successfully for transcription ${transcriptionId} in language: ${finalLanguage}`
     );
   } catch (error) {
     console.error("Error generating summary:", error);
