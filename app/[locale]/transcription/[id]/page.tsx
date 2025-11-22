@@ -91,6 +91,7 @@ export default function TranscriptionPage({ params }: { params: Promise<{ locale
 }
 
 function AudioPlayer({ audioFileId, filename }: { audioFileId: string; filename: string }) {
+    const t = useTranslations();
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
@@ -104,13 +105,45 @@ function AudioPlayer({ audioFileId, filename }: { audioFileId: string; filename:
         const audio = audioRef.current;
         if (!audio) return;
 
+        // Verificar se o arquivo existe antes de tentar carregar
+        const checkAudioAvailability = async () => {
+            try {
+                const response = await fetch(audioUrl, { method: "HEAD" });
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        setError(t("transcription.audioNotAvailable"));
+                        setIsLoading(false);
+                        return;
+                    }
+                }
+            } catch (err) {
+                // Se falhar, ainda tenta carregar normalmente
+                console.error("Error checking audio availability:", err);
+            }
+        };
+
+        checkAudioAvailability();
+
         const updateTime = () => setCurrentTime(audio.currentTime);
         const updateDuration = () => {
             setDuration(audio.duration);
             setIsLoading(false);
         };
-        const handleError = () => {
-            setError("Audio file not available");
+        const handleError = (e: Event) => {
+            const audioElement = e.target as HTMLAudioElement;
+            if (audioElement.error) {
+                // Verificar o código de erro
+                // MEDIA_ERR_ABORTED = 1, MEDIA_ERR_NETWORK = 2, MEDIA_ERR_DECODE = 3, MEDIA_ERR_SRC_NOT_SUPPORTED = 4
+                const errorCode = audioElement.error.code;
+                if (errorCode === MediaError.MEDIA_ERR_NETWORK || 
+                    errorCode === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED) {
+                    setError(t("transcription.audioNotAvailable"));
+                } else {
+                    setError(t("transcription.audioNotAvailable"));
+                }
+            } else {
+                setError(t("transcription.audioNotAvailable"));
+            }
             setIsLoading(false);
         };
         const handleLoadStart = () => setIsLoading(true);
@@ -129,7 +162,7 @@ function AudioPlayer({ audioFileId, filename }: { audioFileId: string; filename:
             audio.removeEventListener("loadstart", handleLoadStart);
             audio.removeEventListener("canplay", handleCanPlay);
         };
-    }, []);
+    }, [audioUrl, t]);
 
     const togglePlay = () => {
         const audio = audioRef.current;
@@ -162,7 +195,7 @@ function AudioPlayer({ audioFileId, filename }: { audioFileId: string; filename:
             <div className="rounded-lg border bg-muted p-8 text-center">
                 <p className="text-sm text-muted-foreground">{error}</p>
                 <p className="mt-2 text-xs text-muted-foreground">
-                    The audio file may have been deleted or is no longer available.
+                    {t("transcription.audioDeleted")}
                 </p>
             </div>
         );
