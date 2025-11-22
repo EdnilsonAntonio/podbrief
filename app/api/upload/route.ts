@@ -6,6 +6,7 @@ import { join } from "path";
 import { existsSync, mkdirSync } from "fs";
 import { checkUploadRateLimit } from "@/lib/rate-limit";
 import { logTranscriptionError, LogLevel, log } from "@/lib/monitoring";
+import { put } from "@vercel/blob";
 
 export async function POST(request: NextRequest) {
   try {
@@ -109,26 +110,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Criar diretório temporário se não existir
-    // No Vercel, apenas /tmp é gravável
-    const uploadDir = process.env.VERCEL ? "/tmp/uploads" : join(process.cwd(), "tmp", "uploads");
-    if (!existsSync(uploadDir)) {
-      mkdirSync(uploadDir, { recursive: true });
-    }
-
-    // Salvar arquivo temporariamente
+    // Salvar arquivo no Vercel Blob Storage (mesmo para arquivos pequenos)
+    // Isso garante que o arquivo persista e esteja acessível depois
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const filename = `${Date.now()}-${file.name}`;
-    const filepath = join(uploadDir, filename);
+    const uniqueFilename = `audio/${user.id}-${Date.now()}-${file.name}`;
+    
+    // Verificar se o token está configurado
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN environment variable is not configured. Please add it to your Vercel project settings.");
+    }
+    
+    console.log(`💾 Saving file to Blob Storage: ${uniqueFilename} (${(file.size / (1024 * 1024)).toFixed(2)}MB)`);
+    const { url } = await put(uniqueFilename, buffer, {
+      access: "public",
+      contentType: file.type,
+      addRandomSuffix: false,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
 
-    await writeFile(filepath, buffer);
+    console.log(`✅ File saved to Blob: ${url}`);
 
-    // Criar registro no banco de dados
+    // Criar registro no banco de dados com URL do Blob
     const audioFile = await prisma.audioFile.create({
       data: {
         userId: user.id,
-        url: filepath, // Temporariamente salvar o caminho local
+        url: url, // URL do Blob Storage
         originalFilename: file.name,
         sizeBytes: file.size,
         durationSeconds: null, // Será calculado depois
@@ -140,9 +147,9 @@ export async function POST(request: NextRequest) {
     // No Vercel, processamos diretamente mas não bloqueamos a resposta
     console.log(`🚀 Starting transcription processing for audioFile ${audioFile.id}`);
     
-    // Processar diretamente (não bloqueia a resposta HTTP)
+    // Processar diretamente usando a URL do Blob
     // O Vercel mantém a função ativa enquanto houver trabalho pendente
-    processTranscription(audioFile.id, filepath, file.name).catch((error) => {
+    processTranscriptionFromBlob(audioFile.id, url, file.name).catch((error) => {
       console.error("Error processing transcription:", error);
     });
 
@@ -160,6 +167,18 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// Importar a função de processamento do Blob
+async function processTranscriptionFromBlob(
+  audioFileId: string,
+  blobUrl: string,
+  originalFilename: string
+) {
+  // Usar a função existente de processamento do Blob
+  const { processTranscriptionFromBlob } = await import("@/lib/transcription/process-blob");
+  return processTranscriptionFromBlob(audioFileId, blobUrl, originalFilename);
+}
+
+// Manter a função antiga para compatibilidade (caso ainda seja usada em algum lugar)
 async function processTranscription(
   audioFileId: string,
   filepath: string,
