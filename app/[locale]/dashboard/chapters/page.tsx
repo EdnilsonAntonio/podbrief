@@ -59,6 +59,10 @@ export default function ChaptersPage() {
       const data = await response.json();
 
       if (!response.ok) {
+        // Se for erro de bot detection, usar mensagem específica
+        if (data.code === "BOT_DETECTION") {
+          throw new Error(data.message || t("chapters.botDetectionMessage"));
+        }
         throw new Error(data.message || data.error || t("chapters.error"));
       }
 
@@ -149,7 +153,21 @@ export default function ChaptersPage() {
             {error && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>
+                  <div className="space-y-2">
+                    <p className="font-semibold">
+                      {error.includes("bot") || error.includes("blocking") 
+                        ? t("chapters.botDetectionError")
+                        : t("chapters.error")}
+                    </p>
+                    <p className="text-sm">{error}</p>
+                    {(error.includes("bot") || error.includes("blocking")) && (
+                      <p className="text-sm mt-2 p-2 bg-muted rounded">
+                        {t("chapters.alternativeSolution")}
+                      </p>
+                    )}
+                  </div>
+                </AlertDescription>
               </Alert>
             )}
 

@@ -529,7 +529,10 @@
     "estimatedCredits": "Crédits estimés nécessaires : {credits}",
     "videoDuration": "Durée de la vidéo : {duration}",
     "chaptersFormat": "Format des Chapitres",
-    "chaptersFormatDescription": "Les chapitres sont formatés au format standard YouTube. Il suffit de les copier et de les coller dans la description de votre vidéo dans YouTube Studio."
+    "chaptersFormatDescription": "Les chapitres sont formatés au format standard YouTube. Il suffit de les copier et de les coller dans la description de votre vidéo dans YouTube Studio.",
+    "botDetectionError": "Détection de Bot YouTube",
+    "botDetectionMessage": "YouTube bloque actuellement l'accès automatisé. Veuillez réessayer plus tard ou utiliser une autre vidéo. Si le problème persiste, vous pouvez télécharger l'audio manuellement et le téléverser pour transcrire.",
+    "alternativeSolution": "Alternative : Téléchargez le fichier audio de YouTube manuellement et téléversez-le en utilisant la fonctionnalité Téléverser l'audio pour générer des chapitres."
   }
 }
 

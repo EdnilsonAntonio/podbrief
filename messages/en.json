@@ -529,7 +529,10 @@
     "estimatedCredits": "Estimated credits needed: {credits}",
     "videoDuration": "Video duration: {duration}",
     "chaptersFormat": "Chapters Format",
-    "chaptersFormatDescription": "The chapters are formatted in the standard YouTube format. Simply copy and paste them into the description of your video in YouTube Studio."
+    "chaptersFormatDescription": "The chapters are formatted in the standard YouTube format. Simply copy and paste them into the description of your video in YouTube Studio.",
+    "botDetectionError": "YouTube Bot Detection",
+    "botDetectionMessage": "YouTube is currently blocking automated access. Please try again later or use a different video. If the problem persists, you can download the audio manually and upload it to transcribe.",
+    "alternativeSolution": "Alternative: Download the audio file from YouTube manually and upload it using the Upload Audio feature to generate chapters."
   }
 }
 

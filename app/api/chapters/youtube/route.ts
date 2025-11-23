@@ -175,9 +175,34 @@ export async function POST(request: NextRequest) {
     // Obter informações do vídeo
     let videoInfo;
     try {
-      videoInfo = await ytdl.getInfo(videoId);
+      // Tentar com configurações para contornar detecção de bot
+      videoInfo = await ytdl.getInfo(videoId, {
+        requestOptions: {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate',
+            'Referer': 'https://www.youtube.com/',
+            'Origin': 'https://www.youtube.com',
+          },
+        },
+      });
     } catch (error: any) {
       console.error("Error fetching video info:", error);
+      
+      // Se o erro for relacionado a bot detection, fornecer mensagem mais específica
+      if (error.message?.includes("Sign in to confirm") || error.message?.includes("bot")) {
+        return NextResponse.json(
+          { 
+            error: "YouTube bot detection",
+            message: "YouTube is currently blocking automated access. Please try again later or use a different video. If the problem persists, you can download the audio manually and upload it to transcribe.",
+            code: "BOT_DETECTION"
+          },
+          { status: 403 }
+        );
+      }
+      
       return NextResponse.json(
         { error: "Failed to fetch video information. The video may be private or unavailable." },
         { status: 400 }
@@ -219,6 +244,16 @@ export async function POST(request: NextRequest) {
       const audioStream = ytdl(videoId, {
         quality: "lowestaudio",
         filter: "audioonly",
+        requestOptions: {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate',
+            'Referer': 'https://www.youtube.com/',
+            'Origin': 'https://www.youtube.com',
+          },
+        },
       });
 
       const writeStream = createWriteStream(tempFilepath);
@@ -276,6 +311,21 @@ export async function POST(request: NextRequest) {
       // Limpar arquivo temporário em caso de erro
       await unlink(tempFilepath).catch(() => {});
       console.error("Error processing YouTube video:", error);
+      
+      // Verificar se é erro de bot detection durante o download
+      if (error.message?.includes("Sign in to confirm") || 
+          error.message?.includes("bot") ||
+          error.message?.includes("confirm you're not a bot")) {
+        return NextResponse.json(
+          {
+            error: "YouTube bot detection",
+            message: "YouTube is currently blocking automated access. Please try again later or use a different video. If the problem persists, you can download the audio manually and upload it to transcribe.",
+            code: "BOT_DETECTION"
+          },
+          { status: 403 }
+        );
+      }
+      
       return NextResponse.json(
         {
           error: "Failed to process video",
