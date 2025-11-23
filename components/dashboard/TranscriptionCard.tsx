@@ -79,8 +79,8 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
                         <div className="rounded-lg bg-primary/10 p-2 group-hover:bg-primary/20 transition-colors">
                             <FileAudio className="h-5 w-5 text-primary" />
                         </div>
-                        <div className="flex-1">
-                            <CardTitle className="text-base">{transcription.fileName}</CardTitle>
+                        <div className="flex-1 min-w-0">
+                            <CardTitle className="text-base line-clamp-2 break-words">{transcription.fileName}</CardTitle>
                             <CardDescription className="mt-1">
                                 {formatDistanceToNow(transcription.createdAt, { addSuffix: true })}
                             </CardDescription>
