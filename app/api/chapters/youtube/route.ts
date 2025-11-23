@@ -222,6 +222,18 @@ export async function POST(request: NextRequest) {
         );
       }
       
+      // Se o erro for relacionado a parsing do HTML (YouTube mudou estrutura)
+      if (error.message?.includes("parsing watch.html") || error.message?.includes("YouTube made a change")) {
+        return NextResponse.json(
+          { 
+            error: "YouTube structure changed",
+            message: "YouTube has changed its structure and our parser needs to be updated. Please download the audio file manually from YouTube and upload it using the 'Upload Audio' feature to generate chapters.",
+            code: "PARSING_ERROR"
+          },
+          { status: 503 }
+        );
+      }
+      
       // Se o erro for EROFS (read-only file system), tentar novamente sem mudar o diretório
       if (error.code === "EROFS" && cwdChanged) {
         try {
@@ -241,14 +253,22 @@ export async function POST(request: NextRequest) {
           });
         } catch (retryError: any) {
           return NextResponse.json(
-            { error: "Failed to fetch video information. The video may be private or unavailable." },
-            { status: 400 }
+            { 
+              error: "YouTube structure changed",
+              message: "YouTube has changed its structure and our parser needs to be updated. Please download the audio file manually from YouTube and upload it using the 'Upload Audio' feature to generate chapters.",
+              code: "PARSING_ERROR"
+            },
+            { status: 503 }
           );
         }
       } else {
         return NextResponse.json(
-          { error: "Failed to fetch video information. The video may be private or unavailable." },
-          { status: 400 }
+          { 
+            error: "YouTube structure changed",
+            message: "YouTube has changed its structure and our parser needs to be updated. Please download the audio file manually from YouTube and upload it using the 'Upload Audio' feature to generate chapters.",
+            code: "PARSING_ERROR"
+          },
+          { status: 503 }
         );
       }
     } finally {
@@ -369,6 +389,19 @@ export async function POST(request: NextRequest) {
             code: "BOT_DETECTION"
           },
           { status: 403 }
+        );
+      }
+      
+      // Verificar se é erro de parsing
+      if (error.message?.includes("parsing watch.html") || 
+          error.message?.includes("YouTube made a change")) {
+        return NextResponse.json(
+          {
+            error: "YouTube structure changed",
+            message: "YouTube has changed its structure and our parser needs to be updated. Please download the audio file manually from YouTube and upload it using the 'Upload Audio' feature to generate chapters.",
+            code: "PARSING_ERROR"
+          },
+          { status: 503 }
         );
       }
       

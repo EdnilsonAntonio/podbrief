@@ -63,6 +63,10 @@ export default function ChaptersPage() {
         if (data.code === "BOT_DETECTION") {
           throw new Error(data.message || t("chapters.botDetectionMessage"));
         }
+        // Se for erro de parsing, usar mensagem específica
+        if (data.code === "PARSING_ERROR") {
+          throw new Error(data.message || t("chapters.parsingErrorMessage"));
+        }
         throw new Error(data.message || data.error || t("chapters.error"));
       }
 
@@ -158,10 +162,13 @@ export default function ChaptersPage() {
                     <p className="font-semibold">
                       {error.includes("bot") || error.includes("blocking") 
                         ? t("chapters.botDetectionError")
+                        : error.includes("structure") || error.includes("parser")
+                        ? t("chapters.parsingError")
                         : t("chapters.error")}
                     </p>
                     <p className="text-sm">{error}</p>
-                    {(error.includes("bot") || error.includes("blocking")) && (
+                    {(error.includes("bot") || error.includes("blocking") || 
+                      error.includes("structure") || error.includes("parser")) && (
                       <p className="text-sm mt-2 p-2 bg-muted rounded">
                         {t("chapters.alternativeSolution")}
                       </p>
