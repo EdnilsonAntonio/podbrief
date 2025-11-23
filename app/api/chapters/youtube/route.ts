@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { prisma } from "@/db/prisma";
-import YtDlpWrap from "yt-dlp-wrap";
-import { unlink } from "fs/promises";
-import { createReadStream } from "fs";
+import ytdl from "@distube/ytdl-core";
+import { unlink, writeFile } from "fs/promises";
+import { createReadStream, createWriteStream } from "fs";
+import { pipeline } from "stream/promises";
 import { join } from "path";
 import { existsSync, mkdirSync } from "fs";
 import { openai } from "@/lib/openai";
@@ -177,7 +178,7 @@ async function processAudioAndGenerateChapters(
   return {
     success: true,
     chapters,
-    videoTitle: videoInfo.title || videoInfo.fulltitle || "Unknown",
+    videoTitle: videoInfo.videoDetails?.title || videoInfo.title || videoInfo.fulltitle || "Unknown",
     videoDuration: videoDuration,
     videoDurationMinutes: Math.round(videoDurationMinutes),
     creditsUsed: creditsToDeduct,
@@ -232,29 +233,58 @@ export async function POST(request: NextRequest) {
       mkdirSync(tempDir, { recursive: true });
     }
 
-    // Usar yt-dlp-wrap para obter informações e baixar o áudio
-    const ytDlpWrap = new YtDlpWrap();
-    
-    // Obter informações do vídeo usando yt-dlp
+    // Mudar para o diretório temporário para que arquivos de debug sejam salvos lá
+    const originalCwd = process.cwd();
+    let cwdChanged = false;
+    try {
+      if (process.env.VERCEL) {
+        process.chdir("/tmp");
+        cwdChanged = true;
+      }
+    } catch (e) {
+      console.warn("Could not change directory for ytdl debug files:", e);
+    }
+
+    // Obter informações do vídeo usando ytdl-core
     let videoInfo: any;
     let videoDuration = 0;
     let videoDurationMinutes = 0;
     
     try {
       console.log(`📊 Getting video info for ${videoId}...`);
-      const info = await ytDlpWrap.getVideoInfo(url);
-      videoInfo = info;
-      videoDuration = info.duration || 0;
+      videoInfo = await ytdl.getInfo(videoId, {
+        requestOptions: {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate',
+            'Referer': 'https://www.youtube.com/',
+            'Origin': 'https://www.youtube.com',
+          },
+        },
+      });
+      
+      videoDuration = videoInfo.videoDetails.lengthSeconds
+        ? parseInt(videoInfo.videoDetails.lengthSeconds)
+        : 0;
       videoDurationMinutes = videoDuration / 60;
       
-      console.log(`✅ Video info retrieved: ${info.title}, Duration: ${videoDurationMinutes.toFixed(2)} min`);
+      console.log(`✅ Video info retrieved: ${videoInfo.videoDetails.title}, Duration: ${videoDurationMinutes.toFixed(2)} min`);
     } catch (error: any) {
-      console.error("Error fetching video info with yt-dlp:", error);
+      console.error("Error fetching video info:", error);
+      
+      // Restaurar diretório original
+      if (cwdChanged) {
+        try {
+          process.chdir(originalCwd);
+        } catch (e) {}
+      }
       
       // Se o erro for relacionado a bot detection
       if (error.message?.includes("Sign in to confirm") || 
           error.message?.includes("bot") ||
-          error.stderr?.includes("Sign in to confirm")) {
+          error.message?.includes("confirm you're not a bot")) {
         return NextResponse.json(
           { 
             error: "YouTube bot detection",
@@ -265,14 +295,34 @@ export async function POST(request: NextRequest) {
         );
       }
       
+      // Se o erro for relacionado a parsing do HTML
+      if (error.message?.includes("parsing watch.html") || 
+          error.message?.includes("YouTube made a change")) {
+        return NextResponse.json(
+          { 
+            error: "YouTube structure changed",
+            message: "YouTube has changed its structure and our parser needs to be updated. Please download the audio file manually from YouTube and upload it using the 'Upload Audio' feature to generate chapters.",
+            code: "PARSING_ERROR"
+          },
+          { status: 503 }
+        );
+      }
+      
       return NextResponse.json(
         { 
           error: "Failed to fetch video information",
-          message: error.message || "The video may be private, unavailable, or YouTube is blocking access. Please try downloading the audio manually and uploading it.",
+          message: "Unable to access YouTube video. This may be due to YouTube restrictions or changes. Please download the audio file manually from YouTube and upload it using the 'Upload Audio' feature to generate chapters.",
           code: "FETCH_ERROR"
         },
         { status: 400 }
       );
+    } finally {
+      // Restaurar diretório original
+      if (cwdChanged) {
+        try {
+          process.chdir(originalCwd);
+        } catch (e) {}
+      }
     }
 
     // Estimar créditos necessários
@@ -290,46 +340,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const tempFilepath = join(tempDir, `youtube-${videoId}-${Date.now()}.%(ext)s`);
+    const tempFilepath = join(tempDir, `youtube-${videoId}-${Date.now()}.mp3`);
 
     try {
-      // Baixar áudio do vídeo usando yt-dlp
+      // Mudar para o diretório temporário novamente para o download
+      if (process.env.VERCEL) {
+        try {
+          process.chdir("/tmp");
+        } catch (e) {}
+      }
+
+      // Baixar áudio do vídeo usando ytdl-core
       console.log(`⬇️ Downloading audio for video ${videoId}...`);
       
-      await ytDlpWrap.execPromise([
-        url,
-        '-f', 'bestaudio/best',
-        '-x', // Extract audio
-        '--audio-format', 'mp3',
-        '--audio-quality', '0', // Best quality
-        '-o', tempFilepath,
-        '--no-playlist',
-        '--quiet',
-        '--no-warnings',
-      ]);
+      const audioStream = ytdl(videoId, {
+        quality: "lowestaudio",
+        filter: "audioonly",
+        requestOptions: {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate',
+            'Referer': 'https://www.youtube.com/',
+            'Origin': 'https://www.youtube.com',
+          },
+        },
+      });
 
-      // yt-dlp adiciona a extensão ao arquivo, então precisamos encontrar o arquivo real
-      const actualFilepath = tempFilepath.replace('%(ext)s', 'mp3');
-      let downloadedFilePath: string;
-      
-      if (existsSync(actualFilepath)) {
-        downloadedFilePath = actualFilepath;
-      } else {
-        // Tentar encontrar o arquivo com qualquer extensão
-        const files = await import("fs/promises");
-        const dirFiles = await files.readdir(tempDir);
-        const downloadedFile = dirFiles.find(f => f.startsWith(`youtube-${videoId}-`));
-        if (!downloadedFile) {
-          throw new Error("Downloaded file not found");
-        }
-        downloadedFilePath = join(tempDir, downloadedFile);
+      const writeStream = createWriteStream(tempFilepath);
+      await pipeline(audioStream, writeStream);
+
+      // Restaurar diretório original
+      if (process.env.VERCEL) {
+        try {
+          process.chdir(originalCwd);
+        } catch (e) {}
       }
-      
-      console.log(`✅ Audio downloaded: ${downloadedFilePath}`);
+
+      console.log(`✅ Audio downloaded: ${tempFilepath}`);
       
       // Processar áudio e gerar capítulos
       const result = await processAudioAndGenerateChapters(
-        downloadedFilePath,
+        tempFilepath,
         videoDuration,
         videoInfo,
         user,
@@ -339,6 +392,13 @@ export async function POST(request: NextRequest) {
       
       return NextResponse.json(result);
     } catch (error: any) {
+      // Restaurar diretório original em caso de erro
+      if (process.env.VERCEL) {
+        try {
+          process.chdir(originalCwd);
+        } catch (e) {}
+      }
+
       // Limpar arquivo temporário em caso de erro
       await unlink(tempFilepath).catch(() => {});
       console.error("Error processing YouTube video:", error);
@@ -373,7 +433,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: "Failed to process video",
-          message: error.message || "An error occurred while processing the video",
+          message: error.message || "An error occurred while processing the video. Please try downloading the audio manually and uploading it.",
         },
         { status: 500 }
       );
