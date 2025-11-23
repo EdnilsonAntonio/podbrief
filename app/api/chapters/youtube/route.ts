@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { prisma } from "@/db/prisma";
-import ytdl from "@distube/ytdl-core";
+import YtDlpWrap from "yt-dlp-wrap";
 import { unlink } from "fs/promises";
-import { createWriteStream, createReadStream } from "fs";
-import { pipeline } from "stream/promises";
+import { createReadStream } from "fs";
 import { join } from "path";
 import { existsSync, mkdirSync } from "fs";
 import { openai } from "@/lib/openai";
@@ -131,6 +130,61 @@ ${transcriptionText.substring(0, 20000)}${transcriptionText.length > 20000 ? "..
   return chapters.trim();
 }
 
+// Função auxiliar para processar transcrição e gerar capítulos
+async function processAudioAndGenerateChapters(
+  audioFilePath: string,
+  videoDuration: number,
+  videoInfo: any,
+  user: any,
+  userData: any,
+  videoDurationMinutes: number
+) {
+  const fileStream = createReadStream(audioFilePath);
+  const transcriptionResponse = await openai.audio.transcriptions.create({
+    file: fileStream as any,
+    model: "whisper-1",
+    response_format: "verbose_json",
+  });
+
+  const transcriptionText = (transcriptionResponse as any).text;
+  const detectedLanguage = (transcriptionResponse as any).language || null;
+
+  console.log(`✅ Transcription completed. Language: ${detectedLanguage || "unknown"}`);
+
+  // Gerar capítulos
+  console.log(`📝 Generating chapters...`);
+  const chapters = await generateChapters(transcriptionText, videoDuration, detectedLanguage);
+
+  // Debitar créditos
+  const creditsToDeduct = Math.max(
+    0.01,
+    Math.round(videoDurationMinutes * 100) / 100
+  );
+
+  const newCredits = Math.max(0, userData.credits - creditsToDeduct);
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      credits: Math.round(newCredits * 100) / 100,
+    },
+  });
+
+  console.log(`💳 Credits deducted: ${creditsToDeduct}. New balance: ${newCredits}`);
+
+  // Limpar arquivo temporário
+  await unlink(audioFilePath).catch(() => {});
+
+  return {
+    success: true,
+    chapters,
+    videoTitle: videoInfo.title || videoInfo.fulltitle || "Unknown",
+    videoDuration: videoDuration,
+    videoDurationMinutes: Math.round(videoDurationMinutes),
+    creditsUsed: creditsToDeduct,
+    language: detectedLanguage,
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser();
@@ -172,46 +226,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Criar diretório temporário se não existir (para debug files do ytdl-core)
+    // Criar diretório temporário se não existir
     const tempDir = process.env.VERCEL ? "/tmp" : join(process.cwd(), "tmp", "youtube");
     if (!existsSync(tempDir)) {
       mkdirSync(tempDir, { recursive: true });
     }
 
-    // Mudar para o diretório temporário para que arquivos de debug sejam salvos lá
-    // Isso evita erro EROFS (read-only file system) no Vercel
-    const originalCwd = process.cwd();
-    let cwdChanged = false;
+    // Usar yt-dlp-wrap para obter informações e baixar o áudio
+    const ytDlpWrap = new YtDlpWrap();
+    
+    // Obter informações do vídeo usando yt-dlp
+    let videoInfo: any;
+    let videoDuration = 0;
+    let videoDurationMinutes = 0;
+    
     try {
-      if (process.env.VERCEL) {
-        process.chdir("/tmp");
-        cwdChanged = true;
-      }
-    } catch (e) {
-      console.warn("Could not change directory for ytdl debug files:", e);
-    }
-
-    // Obter informações do vídeo
-    let videoInfo;
-    try {
-      // Tentar com configurações para contornar detecção de bot
-      videoInfo = await ytdl.getInfo(videoId, {
-        requestOptions: {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate',
-            'Referer': 'https://www.youtube.com/',
-            'Origin': 'https://www.youtube.com',
-          },
-        },
-      });
-    } catch (error: any) {
-      console.error("Error fetching video info:", error);
+      console.log(`📊 Getting video info for ${videoId}...`);
+      const info = await ytDlpWrap.getVideoInfo(url);
+      videoInfo = info;
+      videoDuration = info.duration || 0;
+      videoDurationMinutes = videoDuration / 60;
       
-      // Se o erro for relacionado a bot detection, fornecer mensagem mais específica
-      if (error.message?.includes("Sign in to confirm") || error.message?.includes("bot")) {
+      console.log(`✅ Video info retrieved: ${info.title}, Duration: ${videoDurationMinutes.toFixed(2)} min`);
+    } catch (error: any) {
+      console.error("Error fetching video info with yt-dlp:", error);
+      
+      // Se o erro for relacionado a bot detection
+      if (error.message?.includes("Sign in to confirm") || 
+          error.message?.includes("bot") ||
+          error.stderr?.includes("Sign in to confirm")) {
         return NextResponse.json(
           { 
             error: "YouTube bot detection",
@@ -222,70 +265,15 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      // Se o erro for relacionado a parsing do HTML (YouTube mudou estrutura)
-      if (error.message?.includes("parsing watch.html") || error.message?.includes("YouTube made a change")) {
-        return NextResponse.json(
-          { 
-            error: "YouTube structure changed",
-            message: "YouTube has changed its structure and our parser needs to be updated. Please download the audio file manually from YouTube and upload it using the 'Upload Audio' feature to generate chapters.",
-            code: "PARSING_ERROR"
-          },
-          { status: 503 }
-        );
-      }
-      
-      // Se o erro for EROFS (read-only file system), tentar novamente sem mudar o diretório
-      if (error.code === "EROFS" && cwdChanged) {
-        try {
-          process.chdir(originalCwd);
-          // Tentar novamente sem mudar o diretório
-          videoInfo = await ytdl.getInfo(videoId, {
-            requestOptions: {
-              headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate',
-                'Referer': 'https://www.youtube.com/',
-                'Origin': 'https://www.youtube.com',
-              },
-            },
-          });
-        } catch (retryError: any) {
-          return NextResponse.json(
-            { 
-              error: "YouTube structure changed",
-              message: "YouTube has changed its structure and our parser needs to be updated. Please download the audio file manually from YouTube and upload it using the 'Upload Audio' feature to generate chapters.",
-              code: "PARSING_ERROR"
-            },
-            { status: 503 }
-          );
-        }
-      } else {
-        return NextResponse.json(
-          { 
-            error: "YouTube structure changed",
-            message: "YouTube has changed its structure and our parser needs to be updated. Please download the audio file manually from YouTube and upload it using the 'Upload Audio' feature to generate chapters.",
-            code: "PARSING_ERROR"
-          },
-          { status: 503 }
-        );
-      }
-    } finally {
-      // Restaurar diretório original se foi mudado
-      if (cwdChanged) {
-        try {
-          process.chdir(originalCwd);
-        } catch (e) {
-          // Ignorar se não conseguir restaurar
-        }
-      }
+      return NextResponse.json(
+        { 
+          error: "Failed to fetch video information",
+          message: error.message || "The video may be private, unavailable, or YouTube is blocking access. Please try downloading the audio manually and uploading it.",
+          code: "FETCH_ERROR"
+        },
+        { status: 400 }
+      );
     }
-
-    const videoDuration = videoInfo.videoDetails.lengthSeconds
-      ? parseInt(videoInfo.videoDetails.lengthSeconds)
-      : 0;
-    const videoDurationMinutes = videoDuration / 60;
 
     // Estimar créditos necessários
     const estimatedCredits = Math.max(0.01, Math.round(videoDurationMinutes * 100) / 100);
@@ -302,77 +290,54 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const tempFilepath = join(tempDir, `youtube-${videoId}-${Date.now()}.mp3`);
+    const tempFilepath = join(tempDir, `youtube-${videoId}-${Date.now()}.%(ext)s`);
 
     try {
-      // Baixar áudio do vídeo
+      // Baixar áudio do vídeo usando yt-dlp
       console.log(`⬇️ Downloading audio for video ${videoId}...`);
-      const audioStream = ytdl(videoId, {
-        quality: "lowestaudio",
-        filter: "audioonly",
-        requestOptions: {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate',
-            'Referer': 'https://www.youtube.com/',
-            'Origin': 'https://www.youtube.com',
-          },
-        },
-      });
+      
+      await ytDlpWrap.execPromise([
+        url,
+        '-f', 'bestaudio/best',
+        '-x', // Extract audio
+        '--audio-format', 'mp3',
+        '--audio-quality', '0', // Best quality
+        '-o', tempFilepath,
+        '--no-playlist',
+        '--quiet',
+        '--no-warnings',
+      ]);
 
-      const writeStream = createWriteStream(tempFilepath);
-      await pipeline(audioStream, writeStream);
-
-      console.log(`✅ Audio downloaded: ${tempFilepath}`);
-
-      // Transcrever o áudio
-      console.log(`🎤 Transcribing audio...`);
-      const fileStream = createReadStream(tempFilepath);
-      const transcriptionResponse = await openai.audio.transcriptions.create({
-        file: fileStream as any,
-        model: "whisper-1",
-        response_format: "verbose_json",
-      });
-
-      const transcriptionText = (transcriptionResponse as any).text;
-      const detectedLanguage = (transcriptionResponse as any).language || null;
-
-      console.log(`✅ Transcription completed. Language: ${detectedLanguage || "unknown"}`);
-
-      // Gerar capítulos
-      console.log(`📝 Generating chapters...`);
-      const chapters = await generateChapters(transcriptionText, videoDuration, detectedLanguage);
-
-      // Debitar créditos
-      const creditsToDeduct = Math.max(
-        0.01,
-        Math.round(videoDurationMinutes * 100) / 100
+      // yt-dlp adiciona a extensão ao arquivo, então precisamos encontrar o arquivo real
+      const actualFilepath = tempFilepath.replace('%(ext)s', 'mp3');
+      let downloadedFilePath: string;
+      
+      if (existsSync(actualFilepath)) {
+        downloadedFilePath = actualFilepath;
+      } else {
+        // Tentar encontrar o arquivo com qualquer extensão
+        const files = await import("fs/promises");
+        const dirFiles = await files.readdir(tempDir);
+        const downloadedFile = dirFiles.find(f => f.startsWith(`youtube-${videoId}-`));
+        if (!downloadedFile) {
+          throw new Error("Downloaded file not found");
+        }
+        downloadedFilePath = join(tempDir, downloadedFile);
+      }
+      
+      console.log(`✅ Audio downloaded: ${downloadedFilePath}`);
+      
+      // Processar áudio e gerar capítulos
+      const result = await processAudioAndGenerateChapters(
+        downloadedFilePath,
+        videoDuration,
+        videoInfo,
+        user,
+        userData,
+        videoDurationMinutes
       );
-
-      const newCredits = Math.max(0, userData.credits - creditsToDeduct);
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          credits: Math.round(newCredits * 100) / 100,
-        },
-      });
-
-      console.log(`💳 Credits deducted: ${creditsToDeduct}. New balance: ${newCredits}`);
-
-      // Limpar arquivo temporário
-      await unlink(tempFilepath).catch(() => {});
-
-      return NextResponse.json({
-        success: true,
-        chapters,
-        videoTitle: videoInfo.videoDetails.title,
-        videoDuration: videoDuration,
-        videoDurationMinutes: Math.round(videoDurationMinutes),
-        creditsUsed: creditsToDeduct,
-        language: detectedLanguage,
-      });
+      
+      return NextResponse.json(result);
     } catch (error: any) {
       // Limpar arquivo temporário em caso de erro
       await unlink(tempFilepath).catch(() => {});
