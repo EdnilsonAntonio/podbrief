@@ -172,6 +172,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Criar diretório temporário se não existir (para debug files do ytdl-core)
+    const tempDir = process.env.VERCEL ? "/tmp" : join(process.cwd(), "tmp", "youtube");
+    if (!existsSync(tempDir)) {
+      mkdirSync(tempDir, { recursive: true });
+    }
+
+    // Mudar para o diretório temporário para que arquivos de debug sejam salvos lá
+    // Isso evita erro EROFS (read-only file system) no Vercel
+    const originalCwd = process.cwd();
+    let cwdChanged = false;
+    try {
+      if (process.env.VERCEL) {
+        process.chdir("/tmp");
+        cwdChanged = true;
+      }
+    } catch (e) {
+      console.warn("Could not change directory for ytdl debug files:", e);
+    }
+
     // Obter informações do vídeo
     let videoInfo;
     try {
@@ -203,10 +222,44 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      return NextResponse.json(
-        { error: "Failed to fetch video information. The video may be private or unavailable." },
-        { status: 400 }
-      );
+      // Se o erro for EROFS (read-only file system), tentar novamente sem mudar o diretório
+      if (error.code === "EROFS" && cwdChanged) {
+        try {
+          process.chdir(originalCwd);
+          // Tentar novamente sem mudar o diretório
+          videoInfo = await ytdl.getInfo(videoId, {
+            requestOptions: {
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Accept-Encoding': 'gzip, deflate',
+                'Referer': 'https://www.youtube.com/',
+                'Origin': 'https://www.youtube.com',
+              },
+            },
+          });
+        } catch (retryError: any) {
+          return NextResponse.json(
+            { error: "Failed to fetch video information. The video may be private or unavailable." },
+            { status: 400 }
+          );
+        }
+      } else {
+        return NextResponse.json(
+          { error: "Failed to fetch video information. The video may be private or unavailable." },
+          { status: 400 }
+        );
+      }
+    } finally {
+      // Restaurar diretório original se foi mudado
+      if (cwdChanged) {
+        try {
+          process.chdir(originalCwd);
+        } catch (e) {
+          // Ignorar se não conseguir restaurar
+        }
+      }
     }
 
     const videoDuration = videoInfo.videoDetails.lengthSeconds
@@ -227,13 +280,6 @@ export async function POST(request: NextRequest) {
         },
         { status: 400 }
       );
-    }
-
-    // Criar diretório temporário se não existir
-    // No Vercel, usar /tmp; localmente usar tmp/youtube
-    const tempDir = process.env.VERCEL ? "/tmp" : join(process.cwd(), "tmp", "youtube");
-    if (!existsSync(tempDir)) {
-      mkdirSync(tempDir, { recursive: true });
     }
 
     const tempFilepath = join(tempDir, `youtube-${videoId}-${Date.now()}.mp3`);
