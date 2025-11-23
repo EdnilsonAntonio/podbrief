@@ -148,23 +148,23 @@ export default async function LandingPage({
       {/* Stats Section */}
       <section className="container mx-auto space-y-12 py-20 bg-muted/50">
         <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight">Trusted by Content Creators</h2>
+          <h2 className="text-3xl font-bold tracking-tight">{t("landing.statsTitle")}</h2>
           <p className="mt-2 text-muted-foreground">
-            Join thousands of users who trust PodBrief for their transcription needs
+            {t("landing.statsDescription")}
           </p>
         </div>
         <div className="grid gap-8 md:grid-cols-3 max-w-4xl mx-auto">
           <div className="text-center">
             <div className="text-4xl font-bold text-primary mb-2">10K+</div>
-            <p className="text-muted-foreground">Hours Transcribed</p>
+            <p className="text-muted-foreground">{t("landing.statsHours")}</p>
           </div>
           <div className="text-center">
             <div className="text-4xl font-bold text-primary mb-2">5K+</div>
-            <p className="text-muted-foreground">Active Users</p>
+            <p className="text-muted-foreground">{t("landing.statsUsers")}</p>
           </div>
           <div className="text-center">
             <div className="text-4xl font-bold text-primary mb-2">99.9%</div>
-            <p className="text-muted-foreground">Uptime</p>
+            <p className="text-muted-foreground">{t("landing.statsUptime")}</p>
           </div>
         </div>
       </section>
@@ -211,11 +211,11 @@ export default async function LandingPage({
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-primary" />
-                    <span className="text-sm">Full Transcription</span>
+                    <span className="text-sm">{t("pricing.fullTranscription")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-primary" />
-                    <span className="text-sm">AI Summary</span>
+                    <span className="text-sm">{t("pricing.aiSummary")}</span>
                   </div>
                 </div>
                 {isLoggedIn ? (
@@ -298,7 +298,7 @@ export default async function LandingPage({
                 <span className="text-xl font-bold">{t("common.appName")}</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                AI-powered transcription and summarization for your podcasts.
+                {t("about.footerDescription")}
               </p>
             </div>
             <div>
@@ -324,7 +324,7 @@ export default async function LandingPage({
             </div>
           </div>
           <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} PodBrief. All rights reserved.</p>
+            <p>{t("landing.copyright", { year: new Date().getFullYear() })}</p>
           </div>
         </div>
       </footer>

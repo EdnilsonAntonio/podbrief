@@ -76,7 +76,13 @@
     "ctaTitle": "Prêt à transformer votre contenu audio?",
     "ctaDescription": "Rejoignez des milliers de créateurs de contenu qui utilisent PodBrief pour transformer leur audio en insights exploitables.",
     "ctaButton": "Commencer à transcrire",
-    "ctaButtonFree": "Commencer gratuitement"
+    "ctaButtonFree": "Commencer gratuitement",
+    "statsTitle": "Approuvé par les Créateurs de Contenu",
+    "statsDescription": "Rejoignez des milliers d'utilisateurs qui font confiance à PodBrief pour leurs besoins de transcription",
+    "statsHours": "Heures Transcrites",
+    "statsUsers": "Utilisateurs Actifs",
+    "statsUptime": "Disponibilité",
+    "copyright": "© {year} PodBrief. Tous droits réservés."
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -493,6 +499,37 @@
     "imageSizeError": "La taille de l'image doit être inférieure à 5MB",
     "uploadImageError": "Échec du téléchargement de l'image",
     "confirmDelete": "Veuillez taper 'DELETE' pour confirmer"
+  },
+  "chapters": {
+    "title": "Chapitres YouTube",
+    "description": "Générez des chapitres avec horodatage pour vos vidéos YouTube",
+    "enterUrl": "Entrez l'URL de la vidéo YouTube",
+    "urlPlaceholder": "https://www.youtube.com/watch?v=...",
+    "generateChapters": "Générer les Chapitres",
+    "generating": "Génération des chapitres...",
+    "processing": "Traitement de la vidéo...",
+    "downloading": "Téléchargement de l'audio depuis YouTube...",
+    "transcribing": "Transcription de l'audio...",
+    "creatingChapters": "Création des chapitres avec horodatage...",
+    "chaptersReady": "Chapitres prêts !",
+    "copyChapters": "Copier les Chapitres",
+    "chaptersCopied": "Chapitres copiés dans le presse-papiers !",
+    "error": "Erreur lors de la génération des chapitres",
+    "invalidUrl": "URL YouTube invalide",
+    "urlRequired": "Veuillez entrer une URL de vidéo YouTube",
+    "insufficientCredits": "Crédits insuffisants pour traiter cette vidéo",
+    "howItWorks": "Comment ça fonctionne",
+    "step1Title": "Entrez l'URL YouTube",
+    "step1Description": "Collez le lien de votre vidéo YouTube",
+    "step2Title": "Traitement IA",
+    "step2Description": "Nous téléchargeons l'audio, le transcrivons et analysons le contenu",
+    "step3Title": "Obtenir les Chapitres",
+    "step3Description": "Copiez les chapitres générés et collez-les dans YouTube Studio",
+    "note": "Note : Les chapitres sont générés en fonction du contenu de la vidéo. Vous pouvez les modifier dans YouTube Studio avant de publier.",
+    "estimatedCredits": "Crédits estimés nécessaires : {credits}",
+    "videoDuration": "Durée de la vidéo : {duration}",
+    "chaptersFormat": "Format des Chapitres",
+    "chaptersFormatDescription": "Les chapitres sont formatés au format standard YouTube. Il suffit de les copier et de les coller dans la description de votre vidéo dans YouTube Studio."
   }
 }
 

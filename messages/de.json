@@ -76,7 +76,13 @@
     "ctaTitle": "Bereit, Ihren Audioinhalt zu transformieren?",
     "ctaDescription": "Schließen Sie sich Tausenden von Content-Erstellern an, die PodBrief verwenden, um ihr Audio in umsetzbare Erkenntnisse zu verwandeln.",
     "ctaButton": "Mit der Transkription beginnen",
-    "ctaButtonFree": "Kostenlos loslegen"
+    "ctaButtonFree": "Kostenlos loslegen",
+    "statsTitle": "Vertraut von Content-Erstellern",
+    "statsDescription": "Schließen Sie sich Tausenden von Benutzern an, die PodBrief für ihre Transkriptionsbedürfnisse vertrauen",
+    "statsHours": "Transkribierte Stunden",
+    "statsUsers": "Aktive Benutzer",
+    "statsUptime": "Betriebszeit",
+    "copyright": "© {year} PodBrief. Alle Rechte vorbehalten."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -493,6 +499,37 @@
     "imageSizeError": "Die Bildgröße muss weniger als 5MB betragen",
     "uploadImageError": "Fehler beim Hochladen des Bildes",
     "confirmDelete": "Bitte geben Sie 'DELETE' ein, um zu bestätigen"
+  },
+  "chapters": {
+    "title": "YouTube-Kapitel",
+    "description": "Generieren Sie Kapitel mit Zeitstempeln für Ihre YouTube-Videos",
+    "enterUrl": "YouTube-Video-URL eingeben",
+    "urlPlaceholder": "https://www.youtube.com/watch?v=...",
+    "generateChapters": "Kapitel generieren",
+    "generating": "Kapitel werden generiert...",
+    "processing": "Video wird verarbeitet...",
+    "downloading": "Audio von YouTube wird heruntergeladen...",
+    "transcribing": "Audio wird transkribiert...",
+    "creatingChapters": "Kapitel mit Zeitstempeln werden erstellt...",
+    "chaptersReady": "Kapitel bereit!",
+    "copyChapters": "Kapitel kopieren",
+    "chaptersCopied": "Kapitel in die Zwischenablage kopiert!",
+    "error": "Fehler beim Generieren der Kapitel",
+    "invalidUrl": "Ungültige YouTube-URL",
+    "urlRequired": "Bitte geben Sie eine YouTube-Video-URL ein",
+    "insufficientCredits": "Nicht genügend Credits, um dieses Video zu verarbeiten",
+    "howItWorks": "So funktioniert es",
+    "step1Title": "YouTube-URL eingeben",
+    "step1Description": "Fügen Sie den Link zu Ihrem YouTube-Video ein",
+    "step2Title": "KI-Verarbeitung",
+    "step2Description": "Wir laden das Audio herunter, transkribieren es und analysieren den Inhalt",
+    "step3Title": "Kapitel erhalten",
+    "step3Description": "Kopieren Sie die generierten Kapitel und fügen Sie sie in YouTube Studio ein",
+    "note": "Hinweis: Kapitel werden basierend auf dem Videoinhalt generiert. Sie können sie in YouTube Studio vor der Veröffentlichung bearbeiten.",
+    "estimatedCredits": "Geschätzte benötigte Credits: {credits}",
+    "videoDuration": "Videodauer: {duration}",
+    "chaptersFormat": "Kapitelformat",
+    "chaptersFormatDescription": "Die Kapitel sind im Standard-YouTube-Format formatiert. Kopieren Sie sie einfach und fügen Sie sie in die Beschreibung Ihres Videos in YouTube Studio ein."
   }
 }
 

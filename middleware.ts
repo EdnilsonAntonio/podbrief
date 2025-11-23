@@ -12,12 +12,20 @@ const intlMiddleware = createMiddleware({
 });
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  
+  // Handle /auth/callback without locale - redirect to default locale
+  if (pathname === "/auth/callback" || pathname.startsWith("/auth/callback/")) {
+    const redirectUrl = new URL(`/${defaultLocale}/auth/callback`, request.url);
+    redirectUrl.search = request.nextUrl.search; // Preserve query params
+    return NextResponse.redirect(redirectUrl);
+  }
+  
   // Handle i18n first
   const response = intlMiddleware(request);
   
   try {
     // Extract locale from pathname
-    const pathname = request.nextUrl.pathname;
     const locale = locales.find(
       (loc) => pathname.startsWith(`/${loc}/`) || pathname === `/${loc}`
     ) || defaultLocale;

@@ -76,7 +76,13 @@
     "ctaTitle": "Pronto para Transformar Seu Conteúdo de Áudio?",
     "ctaDescription": "Junte-se a milhares de criadores de conteúdo que usam PodBrief para transformar seus áudios em insights acionáveis.",
     "ctaButton": "Começar a Transcrever",
-    "ctaButtonFree": "Começar Grátis"
+    "ctaButtonFree": "Começar Grátis",
+    "statsTitle": "Confiado por Criadores de Conteúdo",
+    "statsDescription": "Junte-se a milhares de usuários que confiam no PodBrief para suas necessidades de transcrição",
+    "statsHours": "Horas Transcritas",
+    "statsUsers": "Usuários Ativos",
+    "statsUptime": "Tempo de Atividade",
+    "copyright": "© {year} PodBrief. Todos os direitos reservados."
   },
   "dashboard": {
     "title": "Painel",
@@ -493,6 +499,37 @@
     "imageSizeError": "O tamanho da imagem deve ser menor que 5MB",
     "uploadImageError": "Falha ao enviar imagem",
     "confirmDelete": "Por favor, digite 'DELETE' para confirmar"
+  },
+  "chapters": {
+    "title": "Capítulos do YouTube",
+    "description": "Gere capítulos com timestamps para seus vídeos do YouTube",
+    "enterUrl": "Insira a URL do Vídeo do YouTube",
+    "urlPlaceholder": "https://www.youtube.com/watch?v=...",
+    "generateChapters": "Gerar Capítulos",
+    "generating": "Gerando capítulos...",
+    "processing": "Processando vídeo...",
+    "downloading": "Baixando áudio do YouTube...",
+    "transcribing": "Transcrevendo áudio...",
+    "creatingChapters": "Criando capítulos com timestamps...",
+    "chaptersReady": "Capítulos prontos!",
+    "copyChapters": "Copiar Capítulos",
+    "chaptersCopied": "Capítulos copiados para a área de transferência!",
+    "error": "Erro ao gerar capítulos",
+    "invalidUrl": "URL do YouTube inválida",
+    "urlRequired": "Por favor, insira uma URL de vídeo do YouTube",
+    "insufficientCredits": "Créditos insuficientes para processar este vídeo",
+    "howItWorks": "Como funciona",
+    "step1Title": "Insira a URL do YouTube",
+    "step1Description": "Cole o link do seu vídeo do YouTube",
+    "step2Title": "Processamento com IA",
+    "step2Description": "Baixamos o áudio, transcrevemos e analisamos o conteúdo",
+    "step3Title": "Obter Capítulos",
+    "step3Description": "Copie os capítulos gerados e cole-os no YouTube Studio",
+    "note": "Nota: Os capítulos são gerados com base no conteúdo do vídeo. Você pode editá-los no YouTube Studio antes de publicar.",
+    "estimatedCredits": "Créditos estimados necessários: {credits}",
+    "videoDuration": "Duração do vídeo: {duration}",
+    "chaptersFormat": "Formato dos Capítulos",
+    "chaptersFormatDescription": "Os capítulos estão formatados no formato padrão do YouTube. Basta copiar e colar na descrição do seu vídeo no YouTube Studio."
   }
 }
 

@@ -76,7 +76,13 @@
     "ctaTitle": "Ready to Transform Your Audio Content?",
     "ctaDescription": "Join thousands of content creators who use PodBrief to turn their audio into actionable insights.",
     "ctaButton": "Start Transcribing",
-    "ctaButtonFree": "Get Started Free"
+    "ctaButtonFree": "Get Started Free",
+    "statsTitle": "Trusted by Content Creators",
+    "statsDescription": "Join thousands of users who trust PodBrief for their transcription needs",
+    "statsHours": "Hours Transcribed",
+    "statsUsers": "Active Users",
+    "statsUptime": "Uptime",
+    "copyright": "© {year} PodBrief. All rights reserved."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -493,6 +499,37 @@
     "imageSizeError": "Image size must be less than 5MB",
     "uploadImageError": "Failed to upload image",
     "confirmDelete": "Please type 'DELETE' to confirm"
+  },
+  "chapters": {
+    "title": "YouTube Chapters",
+    "description": "Generate chapters with timestamps for your YouTube videos",
+    "enterUrl": "Enter YouTube Video URL",
+    "urlPlaceholder": "https://www.youtube.com/watch?v=...",
+    "generateChapters": "Generate Chapters",
+    "generating": "Generating chapters...",
+    "processing": "Processing video...",
+    "downloading": "Downloading audio from YouTube...",
+    "transcribing": "Transcribing audio...",
+    "creatingChapters": "Creating chapters with timestamps...",
+    "chaptersReady": "Chapters ready!",
+    "copyChapters": "Copy Chapters",
+    "chaptersCopied": "Chapters copied to clipboard!",
+    "error": "Error generating chapters",
+    "invalidUrl": "Invalid YouTube URL",
+    "urlRequired": "Please enter a YouTube video URL",
+    "insufficientCredits": "Insufficient credits to process this video",
+    "howItWorks": "How it works",
+    "step1Title": "Enter YouTube URL",
+    "step1Description": "Paste the link to your YouTube video",
+    "step2Title": "AI Processing",
+    "step2Description": "We download the audio, transcribe it, and analyze the content",
+    "step3Title": "Get Chapters",
+    "step3Description": "Copy the generated chapters and paste them in YouTube Studio",
+    "note": "Note: Chapters are generated based on the video content. You can edit them in YouTube Studio before publishing.",
+    "estimatedCredits": "Estimated credits needed: {credits}",
+    "videoDuration": "Video duration: {duration}",
+    "chaptersFormat": "Chapters Format",
+    "chaptersFormatDescription": "The chapters are formatted in the standard YouTube format. Simply copy and paste them into the description of your video in YouTube Studio."
   }
 }
 
