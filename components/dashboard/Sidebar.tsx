@@ -11,7 +11,6 @@ import {
     Upload,
     Menu,
     X,
-    ListOrdered,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -39,11 +38,6 @@ function NavContent({ onLinkClick }: { onLinkClick?: () => void }) {
             name: t("upload.title"),
             href: `/${locale}/dashboard/upload`,
             icon: Upload,
-        },
-        {
-            name: t("chapters.title"),
-            href: `/${locale}/dashboard/chapters`,
-            icon: ListOrdered,
         },
         {
             name: t("settings.title"),
