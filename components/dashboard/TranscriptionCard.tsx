@@ -74,19 +74,21 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
     return (
         <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-primary/20 focus-within:ring-2 focus-within:ring-primary/20">
             <CardHeader>
-                <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3">
-                        <div className="rounded-lg bg-primary/10 p-2 group-hover:bg-primary/20 transition-colors">
+                <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <div className="rounded-lg bg-primary/10 p-2 group-hover:bg-primary/20 transition-colors flex-shrink-0">
                             <FileAudio className="h-5 w-5 text-primary" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <CardTitle className="text-base line-clamp-2 break-words">{transcription.fileName}</CardTitle>
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                            <CardTitle className="text-base break-words whitespace-normal">{transcription.fileName}</CardTitle>
                             <CardDescription className="mt-1">
                                 {formatDistanceToNow(transcription.createdAt, { addSuffix: true })}
                             </CardDescription>
                         </div>
                     </div>
-                    {getStatusBadge()}
+                    <div className="flex-shrink-0">
+                        {getStatusBadge()}
+                    </div>
                 </div>
             </CardHeader>
             <CardContent>
